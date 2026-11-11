@@ -1,6 +1,6 @@
 # Artifact blueprint
 
-What goes into a learning artifact (an HTML lesson, interactive explainer, study guide, practice set, or multi-week course), and in what order. How to make it look good and behave well is in `artifact-craft.md`. Two complete worked examples live in `artifact-examples/`: a checkable domain (`sql-left-vs-inner-join.html`) and a motor skill (`guitar-notes-low-e-and-a.html`). Open one before building your first artifact; they show every part below in about 36 KB each.
+What goes into a learning artifact (an HTML lesson, interactive explainer, study guide, practice set, or multi-week course), and in what order. How to make it look good and behave well is in `artifact-craft.md`. Two complete worked examples live in `artifact-examples/`: a checkable domain (`sql-left-vs-inner-join.html`) and a motor skill (`guitar-notes-low-e-and-a.html`). Open one before building your first artifact; they show every part below in about 50 KB each.
 
 The short version: **build a path, not a pile.** An artifact teaches when the learner has to do something at every step and finds out whether they were right. A page that explains everything clearly and asks nothing is a reference document, and reading one feels like understanding without producing any (Muller's students rated the clear video "clear, concise, easy to understand" and scored 6.3 of 26 after watching it, up from 6.0).
 
@@ -52,7 +52,7 @@ Rules of thumb:
 
 Do three things before writing a word of content.
 
-1. **List the two to four most common wrong ideas** about the topic. Joins: "a LEFT JOIN returns one row per left row"; "a join is a Venn-diagram filter, so it can't return more rows than a table has"; "a WHERE on the right table is harmless". Guitar note-finding: "every neighbouring letter is two frets apart". These become the hook, the wrong options in multiple choice, and the retrieval items.
+1. **List the two to four most common wrong ideas** about the topic. Joins: "a LEFT JOIN returns one row per left row"; "a join is a Venn-diagram filter, so it can't return more rows than a table has"; "a WHERE on the right table is harmless". Guitar note-finding: "every neighbouring letter is two frets apart". These become the hook, the wrong options in multiple choice, and the retrieval items. Write each one as a rule the script can apply (`wrong.oneRowPerLeft(tables)`, `wrong.allTwoFrets(note)`) beside the correct engine, because every item in the page will be filtered against them (`diagnosis-and-feedback.md`, section 13).
 2. **Write the checks before the content** (backward design, used here only as an ordering rule). For each objective, write the item that would prove it. Then write only the content those items need. Anything that serves no check is a candidate for the appendix or for deletion.
 3. **Decide the domain type,** because it decides what a self-check can be (section 12):
    - *Checkable*: code, math, SQL, factual and conceptual questions, writing against a rubric. The page or Claude verifies.
@@ -65,13 +65,13 @@ Build in this order. Do not ship a part missing its "must contain".
 
 | # | Part | Must contain | Prevents |
 |---|---|---|---|
-| 0 | Placement check | 3 to 8 quick items ordered easy to hard, scored in the page, ending in a **route** (start here, skip to there, learn this prerequisite first) | Writing for the wrong learner; experts bored, beginners lost |
+| 0 | Placement check | 3 to 8 quick discriminating items ordered easy to hard, scored in the page, ending in a **route that changes the path** (parts collapsed, practice started at a later level, or a prerequisite named) | Writing for the wrong learner; experts bored, beginners lost |
 | 1 | Who and what | One line on who it's for, 1 to 3 observable objectives, time needed | No idea what they'll be able to do |
 | 2 | Hook | A prediction the learner commits to, chosen so a common misconception gets it wrong, then the contrast | Clear exposition that leaves wrong beliefs intact |
 | 3 | Chunks (3 to 6) | One idea each: short explanation, one worked example with labeled steps, then a check on that idea. Terms defined where first used | Walls of text; jargon before definition |
-| 4 | Fading | Worked, then one blank, then more blanks, then the learner alone, with variants | Show-the-answer-then-say-derive-it |
+| 4 | Fading | Worked, then one blank, then more blanks, then the learner alone, with discriminating variants, ending on a mastery criterion, with a "test me" exit | Show-the-answer-then-say-derive-it; tedium past mastery |
 | 5 | Application | A task on a new surface with a domain-fit check (in-page validation, or paste back to Claude) | Recognising the example without being able to do it |
-| 6 | Retrieval | Mixed items on all chunks with the content out of sight, an "explain why" item, and a dated return plan | Rereading mistaken for learning |
+| 6 | Retrieval | Mixed **production** items (typed, built, played) on all chunks in a new context, content out of sight, an "explain why" item, and a dated return plan | Rereading mistaken for learning; recognition mistaken for recall |
 | 7 | Appendix | Tables, syntax, full charts. Collapsed, linked from where needed | Reference material on the main path |
 
 Each part is backed differently. Retrieval and spacing are the strongest (Dunlosky et al. 2013 rate practice testing and distributed practice high utility). Segmenting, contiguity and coherence come from Mayer's multimedia principles (moderate to strong for short lessons). Misconception confrontation is one randomized study plus its author's account (Muller et al. 2008). The overall sequence is a practitioner synthesis.
@@ -85,7 +85,13 @@ The artifact finds out where the learner is before presenting content, then rout
 - 3 to 8 items, easy to hard, each tied to one prerequisite or one chunk.
 - "Not sure" as an explicit option. It routes; it doesn't count as wrong. Without it learners guess, and a lucky guess skips them past what they need.
 - For a physical skill, one "can you do X right now" item with an observable answer, plus one setup check the rest of the lesson depends on (guitar: "fret 5 on the low E and the open A should sound the same; does yours?").
-- A **route, not a score**: "Start at Part 1", "Skip to Part 4, then do Part 7", "Learn the six open string names first (ask Claude for a five-minute drill)". Let the learner override it; every part stays open.
+- **Discriminating items.** Each item is one where the misconception it probes gives a different answer from the right rule (`diagnosis-and-feedback.md`, section 13). A placement item the misconception answers correctly routes the learner straight past the part that would fix it.
+- A **route that changes the path**, not a score and not advice. Advice ("you could skip to Part 4") leaves a strong learner doing every step, which is what the graders found in both iteration 1 lessons. Do at least one of these:
+  - **Collapse the parts they placed out of.** Each skipped part shows one line ("Placed out: you already find naturals on the low E") and a "Do this part anyway" button; the progress map marks it "placed out", not "done".
+  - **Start practice at a later level.** A fading trainer begins at the level the placement supports (all blanks, or alone), and steps back on a miss as usual.
+  - **Jump.** Scroll to the first part they need and put focus on its heading.
+  - **Name a prerequisite** when the base is missing: "Learn the six open string names first (ask Claude for a five-minute drill)".
+  The learner can always override. Skipped ideas come back in the final retrieval, so a lucky placement is caught there.
 - Use a different surface from the hook. The SQL placement uses a pets table so it doesn't spoil the hook's customers-and-orders prediction.
 
 **Example** (from the SQL lesson)
@@ -97,7 +103,7 @@ The artifact finds out where the learner is before presenting content, then rout
 
 The wrong options are the misconceptions: 3 is "one row per owner", 12 is "every pair". A placement item whose misconception answer equals the right answer tells you nothing; the first draft of that item had exactly that collision (three owners, three INNER rows), and it was caught only because the counts were computed and compared.
 
-**Store the result** and use it: prefill the review set, and mark skipped chunks as "assumed, checked again in retrieval".
+**Store the result** and use it on reload: re-apply the collapsed parts, prefill the review set, and mark skipped chunks as "placed out, checked again in retrieval".
 
 ## 5. Part 1: Who it's for and what they'll be able to do
 
@@ -119,6 +125,7 @@ Why: in Muller, Bewes, Sharma and Reimann (2008), 364 first-year physics student
 
 - A commit step: the learner picks or types an answer, and the page records it before revealing anything. A "click to reveal" with no commitment gives the learner nothing to compare against.
 - Distractors that are the misconceptions, each with its own explanation.
+- **A case the misconception gets wrong, verified by computing it both ways.** Run the hook's case through the correct engine and through each misconception function, and assert they differ (in the page's `checks` array, section 14). One iteration 1 hook used a stack that scored 18 under both the correct rule and the planted misconception, and told the misconception holder "Right."
 - The contrast: show the actual result (computed, section 14) next to their pick.
 - A sentence that normalises the discomfort when it's likely: "Most people say 2." Muller's dialogue students reported higher mental effort and called it confusing; a learner who isn't told that may read confusion as a bad lesson.
 
@@ -155,7 +162,11 @@ Why: for novices, studying worked examples beats solving equivalent problems (Ba
 **Must contain**
 
 - A visible fade: the worked example, then fewer givens. In the guitar lesson, the low E walk is fully worked; on the A string, three of eight frets are blank; then the learner finds every copy of a note on a blank board.
-- **Variants, not one fixed item.** Generate new items from data (new random orders tables, a different target note). A learner who misses gets explanation plus a fresh item, so they can't pass by clicking until the right option lights up. Require a short streak ("two in a row", "four in a row") to finish.
+- **Variants, not one fixed item.** Generate new items from data (new random orders tables, a different target note). A learner who misses gets explanation plus a fresh item, so they can't pass by clicking until the right option lights up.
+- **Discriminating variants.** The generator keeps only items where each named misconception gives a different answer, with at most a small minority of non-discriminating ones, and its rate is measured (`artifact-craft.md`, section 5.8). One iteration 1 generator mostly produced single-colour stacks where the wrong rule and the right one agreed, so a learner holding the misconception passed "two in a row" uncontradicted about 56% of the time.
+- **Stop on mastery, not on a level count.** Practice ends on a criterion such as "three right in a row on discriminating items", and only discriminating items count toward it. A learner who meets it moves on even if more levels were planned. In iteration 1 a six-level fading trainer outlasted the simulated learner, who quit at level 4 from tedium after already getting the idea.
+- **An "I've got this, test me" exit.** Offer one or two challenge items, harder than the current level and discriminating for every named misconception. Passing finishes the part; missing drops the learner into practice at the level that matches the miss, with the miss explained. This is expertise reversal handled in the page instead of by willpower.
+- **A drill the skill is the easiest way to pass.** Check whether a shortcut solves it (arithmetic on given numbers, matching the shape of an option, a constant answer). If one does, change the task (`diagnosis-and-feedback.md`, section 11, item 10).
 - No answer on screen before the attempt. Hints go from "which step are you on?" to "what rule applies here?" to a worked parallel example, and the actual answer only after attempts.
 
 **Expertise reversal.** For someone who already knows the procedure, worked examples get in the way. That's what the placement route is for: send them past the worked chunks to the transfer and retrieval parts.
@@ -174,12 +185,15 @@ One task that looks different from the examples but has the same structure: new 
 
 End with retrieval, not a summary. Mixed items from every chunk, content out of sight ("don't scroll up"), on new surfaces, including one "explain why" item. Then a dated return plan.
 
+**Production, not recognition.** Retrieval items ask the learner to produce: type the row counts, write the WHERE clause, click every copy of the note on a blank board, type the fret, say the rule in a sentence. Put them in a context the lesson didn't practise: a new key, new tables, a new input, the reverse direction ("which note is at fret 8?" after drilling "where is C?"). Multiple choice in familiar settings measures whether the learner recognises the answer, and in iteration 1 the graders could answer one lesson's closing multiple choice from page load without doing any of it. Generated items also make the section useless to answer before the lesson, since there is nothing to copy. Use multiple choice here only for an item that can't be typed, and then with the hygiene rules in `artifact-craft.md`, section 5.1.
+
 Why: practice testing and distributed practice are the two techniques Dunlosky et al. rate high utility across learners, materials and delays. Rereading and summarising rate low. A restated recap feels productive and is passive; convert every recap into a question.
 
 **Must contain**
 
-- 3 to 5 mixed items, interleaving the confusable ones (INNER vs LEFT, sharps vs flats). Interleaving helps most when the categories are easy to confuse (Brunmair and Richter 2019, g = 0.42 overall; blocking wins for vocabulary lists, so don't interleave unrelated word lists).
-- Commit before reveal, and feedback that explains.
+- 3 to 5 mixed production items in a new context, interleaving the confusable ones (INNER vs LEFT, sharps vs flats). Interleaving helps most when the categories are easy to confuse (Brunmair and Richter 2019, g = 0.42 overall; blocking wins for vocabulary lists, so don't interleave unrelated word lists).
+- Commit before reveal, and feedback that explains. A typed answer that matches a misconception's answer gets that misconception's explanation.
+- **A soft gate in time.** Retrieval is worth most after a gap. Show a "Start from memory" button rather than live items, and if the learner finished the last chunk within the hour, say so ("This works best tomorrow; start anyway?"). Don't lock it.
 - **A schedule that records failure.** All right: next review in a growing gap (3 days, then 6, then 12). Any miss: tomorrow. Show the date and say plainly that nothing will remind them: "Put it in your calendar now." A static page can't send a reminder; promising one is a lie.
 - A way back into Claude: "If you'd rather, ask Claude for a fresh set then." When the learner returns to chat, Claude starts with retrieval, not a recap.
 
@@ -216,6 +230,7 @@ Motor and physical skills. The page can't see or hear the attempt, and this skil
 - **Report back.** A summary built from what the learner did on the page, misses included, with a blank line for "what I noticed", to paste into chat. Claude then adjusts the next unit.
 - **Say what the page can't see.** One sentence: "The page plays notes; it never listens."
 - **Name physical risks** a teacher would catch (stretches, bends, tension) and never make a risky movement a pass requirement.
+- **Check each criterion against the domain.** Work one real case through every "you've got it when…" line: can a correct performance fail it, or a wrong one pass it? Iteration 1's "the last note of bar 12 is the root" was wrong over the V chord in bar 12, and the page then told the learner the resulting note was a mistake (`diagnosis-and-feedback.md`, section 11, item 9). The same applies to criteria built on the page's own reference: if the page plays the low copy of a note and the learner may play the octave above, say that the octave counts.
 
 ## 13. Progress and review that record failure
 
@@ -239,6 +254,9 @@ How to apply it:
 - **Derive everything from it:** the tables on screen, the worked trace, the result counts, the right option, every wrong option's explanation ("Fret 4 is C#/Db"), the fretboard SVG, the appendix chart, the target pitch the audio plays.
 - **No hand-typed facts the code could derive.** "Produces the five rows from Part 1" becomes a number filled in by script. "Ana's 12 order failed the test" becomes a sentence generated from the data. If the data changes, nothing goes stale.
 - **Check the engine independently.** Compute a handful of answers by a separate route (a short Python script, a hand calculation, a different library) and compare against what the page renders. Both example lessons were checked this way: all 26 fretboard labels, the walk table, and every generated quiz answer against an independent standard-tuning calculation.
+- **Prose describing generated content is generated or asserted.** Iteration 1's fretboard lesson had a correct engine and still failed the accuracy gate on three hand-written sentences: "a six-note lick that... finishes in box 2" (the lick ended on the root in box 1, as the page's own table showed), "a bass root on beats 1 and 3" (beat 3 played the fifth), and a goal of 60 bpm in the objectives against a rung labelled "70 bpm (the objective)". Every sentence that names a specific value about computed content (where a sequence ends, which beat plays which note, a count, a tempo, a total, which item is longest) is either filled in by script or covered by an assertion in a `checks` array that runs at page load in development and lists every failure in the console and on the page (`artifact-craft.md`, section 10).
+- **One home for each goal value.** Objectives, ladder labels, pass criteria and the summary all read the same constant (`GOAL_BPM`, `STREAK`), so 60 in one place and 70 in another can't happen.
+- **Trace every value-bearing sentence before shipping.** Read the rendered page, and for each sentence that states a number, a position, a name from the data or a "first/last/longest", point to the code or check that guarantees it. A sentence you can't trace gets generated, asserted or rewritten without the value.
 - **Things the code can't derive** (a historical date, a definition, an API's behaviour) get checked against a source before shipping, and if Claude can't verify one, the page says so in place rather than presenting it as a key.
 - **Render the result and look at it.** Open the page in a headless browser, play through the interactions, and read what it actually says (`artifact-craft.md`, section 10).
 
@@ -284,7 +302,7 @@ Each unit's page ends with the report-back summary (section 12), which is what m
 
 ## 18. Pre-ship checklist
 
-Run this before handing over any learning artifact. Every item maps to a root cause in the fretboard teardowns (`research/baseline/fretboard-teardown/`); the right-hand column says which.
+Run this before handing over any learning artifact. Every item maps to a root cause in the fretboard teardowns (`research/baseline/fretboard-teardown/`) or to a failure in the iteration 1 blind test (`testing/reports/iter-1.md`); the note after each item says which.
 
 **Scope and learner**
 
@@ -292,7 +310,7 @@ Run this before handing over any learning artifact. Every item maps to a root ca
 - [ ] Multi-week request: unit 1 plus a course map only; later units wait for the learner's report. *(Root cause 1)*
 - [ ] Session time stated, and the unit fits it. *(Load: L2 alone held nine intervals, a table and a three-week schedule)*
 - [ ] One line naming who it's for, addressed to this learner, not someone else. *(wrong-learner: "your four models")*
-- [ ] Placement check with "Not sure", ending in a route; physical prerequisites checked. *(no-diagnosis, missing-physical-prereq)*
+- [ ] Placement check with "Not sure", ending in a route that changes the path (collapsed parts or a later starting level, overridable), not advice; physical prerequisites checked. *(no-diagnosis, missing-physical-prereq; iteration 1: routing was advice only in both lessons)*
 - [ ] Move-on bars are reachable in a session or two; mastery goes to review. *(Root cause 8: pass criteria as aspirations; mastery-cliff)*
 
 **Content correctness**
@@ -301,16 +319,21 @@ Run this before handing over any learning artifact. Every item maps to a root ca
 - [ ] Engine outputs spot-checked by an independent route; facts the code can't derive checked against a source, or flagged on the page. *(Root cause 2)*
 - [ ] No hedges standing in for checks ("verify this before trusting it"). *(F12: "check each note against the scale before you trust this")*
 - [ ] Each worked example satisfies the rule it demonstrates. *(F03: the voice-leading example broke its own rule)*
+- [ ] Every sentence naming a specific value about computed content is generated or asserted in a `checks` array that passes at load; every value-bearing sentence traced to its source. *(Iteration 1: the lick, bass-beat and tempo sentences)*
+- [ ] Goals stated in more than one place read one constant and match. *(Iteration 1: 60 bpm vs 70 bpm)*
 - [ ] Each concept has one home; later mentions are retrieval or links. *(Root cause 7, F30: guide tones taught three times, contradicting each other)*
 
 **Learning sequence**
 
-- [ ] The hook asks for a committed prediction that a common misconception gets wrong. *(F38: lessons opened with claims, not problems)*
+- [ ] The hook asks for a committed prediction that a common misconception gets wrong, verified by computing the case under each misconception. *(F38: lessons opened with claims, not problems; iteration 1: the hook rewarded the misconception)*
+- [ ] Every placement, practice, mastery and retrieval item discriminates: each named misconception gives a different answer. Generators filtered, rate measured, non-discriminating items a small minority and never counted toward mastery. *(Iteration 1: 75% of one generator's items couldn't detect the misconception)*
+- [ ] Practice ends on a mastery criterion on discriminating items, with an "I've got this, test me" challenge; no fixed level count past mastery. *(Iteration 1: the learner quit at level 4 of 6)*
+- [ ] No drill can be passed by a shortcut that skips the skill. *(Iteration 1: lick frets as root plus offsets)*
 - [ ] Terms defined in the chunk that first uses them; legends next to their figures. *(forward-jargon; tab legend 4,000 lines below the first tab)*
 - [ ] No answer visible before the attempt; fading is built into the page, not instructed. *(Root cause 6: "derive it" printed under the derivation)*
 - [ ] Variants after a miss, and a streak to finish. *(Walkthrough #8: 20 random clicks passed the ear trainer)*
 - [ ] A transfer task on a new surface. *(no-practice)*
-- [ ] Retrieval at the end with content out of sight, plus a dated return plan; no restated summary. *(F26: no cumulative retrieval)*
+- [ ] Retrieval at the end is production (typed, built, played) in a new context, with content out of sight, plus a dated return plan; no restated summary, no recognition-only multiple choice. *(F26: no cumulative retrieval; iteration 1: closing multiple choice answerable from page load)*
 
 **Checks and progress**
 
@@ -318,6 +341,7 @@ Run this before handing over any learning artifact. Every item maps to a root ca
 - [ ] Wrong-answer feedback explains the specific error, not "try again". *(F24: "Not that one. Play it again")*
 - [ ] Honor-system skills: observable numeric criteria, an external reference, a tempo ladder or equivalent, record-and-compare, and a "not yet" path that changes the plan. *(Root causes 4 and 8; unverifiable-self-check)*
 - [ ] No check depends on the skill being trained. *(F19: "sing the leap")*
+- [ ] Every "you've got it when…" criterion checked against the domain on a real case: a correct performance can't fail it and a wrong one can't pass it. *(Iteration 1: root on bar 12 over the V chord)*
 - [ ] Progress stores attempts and misses; the map shows partial states; review has a miss path. *(F25: review could only move forward; "0 of 68 done")*
 - [ ] No "mark done" as the only gate. *(96 of 109 buttons were "Mark done")*
 - [ ] A report-back summary to paste into chat. *(no-feedback-loop)*
@@ -332,7 +356,7 @@ Run this before handing over any learning artifact. Every item maps to a root ca
 
 - [ ] Counts, numbering and cross-references match. No authoring notes, self-corrections or truncated sentences. *(Root cause 7: "Sixty-eight lessons" over a counter of 96; "NO:"; "becomes the...")*
 - [ ] No boilerplate advice stamped onto every step. *(F32: "vary the dynamics" on a note-naming drill)*
-- [ ] Rendered in a browser and played through at desktop and phone widths; no console errors; `artifact-craft.md` checklist passed.
+- [ ] Rendered in a browser and played through at desktop and phone widths; the core task works at 390 px with no sideways scrolling; no console errors; `artifact-craft.md` checklist passed. *(Iteration 1: the main construction task scrolled sideways on a phone)*
 
 <!--
 Sources and findings behind this file:
@@ -342,5 +366,6 @@ Sources and findings behind this file:
 - research/notes/F-domain-pedagogy.md: worked examples for novices (Barbieri et al. 2023), subgoal labels, PRIMM predict-first, Parsons problems, slow practice and smallest failing unit, feedback on physical skill without observation (v0).
 - research/notes/I-video-educators.md: findings 1 (predict, worked example with a shown mistake, recap converted to retrieval), 2 (Muller video numbers 6.0 to 6.3 vs 11 of 26), 3 (motor-skill session shape, unverified).
 - research/baseline/fretboard-teardown/01-instructional-design.md (F01 to F39, root causes 1 to 8), 02-learner-walkthrough.md (tags, quit point day 5), 03-guitar-teacher.md (about 30 factual errors, move-on vs mastery bar, lessons that generalize).
+- testing/reports/iter-1.md, iter-1-grading-fretboard.md, iter-1-grading-driftstones.md: prose not checked against computed content, non-discriminating hook and generator, advice-only placement, practice past mastery, recognition-only retrieval, the bar-12 criterion, phone-width scrolling, the longest-option tell, the arithmetic drill. The rules drawn from them are Practitioner (one run per condition, graded by one model).
 - Evidence grades: retrieval and spacing Strong; Mayer principles Moderate to Strong for short lessons; refutation Moderate; worked examples Strong for math novices; fading and concreteness fading leads at abstract level; the overall sequence, honor-system design and multi-week rules Practitioner or v0.
 -->

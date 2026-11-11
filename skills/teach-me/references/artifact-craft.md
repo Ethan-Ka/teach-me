@@ -15,7 +15,7 @@ How to make a learning artifact look good and be properly interactive. `artifact
 7. [Media: sound with Web Audio](#7-media-sound-with-web-audio)
 8. [Media: diagrams generated from data](#8-media-diagrams-generated-from-data)
 9. [Progress map and current step](#9-progress-map-and-current-step)
-10. [Checking the built page](#10-checking-the-built-page)
+10. [Checking the built page](#10-checking-the-built-page) (fact checks at load, tracing the prose, phone widths, longest strings)
 11. [Craft checklist](#11-craft-checklist)
 
 ---
@@ -71,11 +71,26 @@ Load from Google Fonts with a fallback stack that still reads well offline. Writ
 - **Hierarchy from position, weight and space,** not size alone. A heading in full ink with space above it; body a step quieter.
 - **Asymmetry.** A narrow progress rail on the left and a reading column, with the remaining space on the right, reads as composed; a centered column with identical cards does not.
 - **No decoration on the path.** No small labels stacked above headings, no icon tiles, no emoji, no badge on every section. Part numbers ("Part 3") are legitimate because the learner really is moving through a sequence.
+- **No colored left border on callouts, feedback or route boxes.** It's the stock template move and the audit flags it. Set a route or plan apart with space, a full hairline border, a surface tint, or a bold lead word ("Your route."). A progress rail whose rule marks the current step carries information and is the one defensible case.
+- **Long text wraps inside its container.** Every text slot gets the longest string it can hold, and it must wrap rather than overflow or cross a border. Two traps recur. A `legend` with long text sits across its fieldset's top border in most browsers; fix it with `legend { float: left; width: 100%; padding: 0; margin-bottom: .5rem }` and `legend + * { clear: both }`. Long unbroken tokens (code, URLs, IDs) push a box wider than the phone; give text containers `overflow-wrap: anywhere` and flex children `min-width: 0`.
 
 ### Themes, phones, print
 
 - **Light and dark themes,** both designed and both measured. Follow `prefers-color-scheme` by default, with a toggle that stores the choice. Redefine tokens under `@media (prefers-color-scheme: dark)` guarded by `:root:not([data-theme=light])`, and again under `:root[data-theme=dark]`.
-- **Phones at 390 px and 320 px.** No horizontal page scroll. A wide diagram (a 13-fret neck) may scroll inside its own container with `overflow-x: auto` and a sensible `min-width`; say so in the layout, don't let the page scroll. Rails become a wrapped row of links at the top. Hit targets at least 44 by 44 CSS px.
+- **Phones at 390 px and 320 px.** No horizontal page scroll, and **the core task needs no sideways scrolling either.** A learner who has to scroll inside a diagram while clicking on it loses the part they just did; in iteration 1 the main construction task (click all twelve notes) and even a one-string diagram sat mostly off screen at 400 px behind a `min-width: 820px`. Inner scrolling is acceptable only for a reference figure nobody interacts with. Rails become a wrapped row of links at the top. Hit targets at least 44 by 44 CSS px.
+
+### Wide diagrams on a phone
+
+Pick the strategy by what the task needs to see, and switch on the container's width (`matchMedia` or a `ResizeObserver`), redrawing from the same data:
+
+| Strategy | When it fits | How |
+|---|---|---|
+| **Rotate** | The diagram is long in one direction and the task uses its full length (a neck, a timeline, a number line) | Draw the long axis vertically below about 600 px: one coordinate function `P(along, across)` that returns `[x, y]` or `[y, x]`, and arrow keys remapped so Down moves along the long axis. Page scroll is vertical, which phones do well |
+| **Crop to the relevant region** | The task uses only part of the diagram (one box of frets, three rows of a table, one subtree) | Compute the range the task needs from the data, pad it by one unit each side, and draw only that, with a label saying what's shown ("frets 4 to 10") |
+| **Zoom to the active range** | The learner moves through the diagram step by step | Draw the full diagram, set the `viewBox` to the active window, and move it as the task advances; show a small overview strip if position matters |
+| **Vertical layout** | Side-by-side parts (two tables, before and after) | Stack them, with the shared key aligned and labelled in each |
+
+Then test it: at 390 and 320 px, play the core task through by script and assert that its container's `scrollWidth <= clientWidth` and that every target is at least 44 px (section 10).
 - **Print styles for study guides.** Hide buttons, the theme toggle and the progress rail; force a white background; open `<details>`; avoid breaking a worked example across pages (`break-inside: avoid-page`).
 - **Motion only for state changes,** under 220 ms, and none under `prefers-reduced-motion`. A beat light changing is a state change; content fading in on scroll is not.
 
@@ -166,7 +181,9 @@ function shuffle(a) {
 Minimum CSS the sketches expect (adapt the tokens to your palette):
 
 ```css
-.q { border: 1px solid var(--rule); border-radius: 6px; padding: 1rem; margin: 1.25rem 0; }
+.q { border: 1px solid var(--rule); border-radius: 6px; padding: 1rem; margin: 1.25rem 0; min-width: 0; overflow-wrap: anywhere; }
+.q legend { float: left; width: 100%; padding: 0; margin-bottom: .5rem; font-weight: 700; }
+.q legend + * { clear: both; }
 .opt { display: flex; gap: .6rem; padding: .45rem .5rem; cursor: pointer; }
 .opt.was-wrong { color: var(--muted); }
 .btn { min-height: 44px; padding: .5rem 1rem; font-weight: 700; cursor: pointer; }
@@ -189,12 +206,33 @@ Minimum CSS the sketches expect (adapt the tokens to your palette):
 
 **Keyboard and accessibility.** A real `fieldset` with a `legend` and native radios gives arrow-key selection and a group name for free. Feedback in an `aria-live="polite"` region. Write each option's text so it makes sense out of context, since screen readers read it alone.
 
+**Option hygiene.** A test-wise learner can beat a badly written item without the knowledge, and in iteration 1 one did: "it was the longest option". So:
+
+- **Similar length and grammar.** Every option fits the stem the same way and runs within about a fifth of the others' length. If the right answer needs a qualifier, give the wrong ones qualifiers too.
+- **Wrong options are named misconceptions**, each the answer a specific wrong rule produces (section 5.8), with its own explanation. A filler distractor nobody would pick makes the item easier, not fairer.
+- **Shuffle the order at render.** `choice()` below shuffles a copy of the options unless the item sets `keepOrder` (for ordered scales like "1 / 2 / 3 / Not sure"), so the right answer isn't always second.
+- **Lint it.** Add `mcLint` to the page's `checks` (section 10) for every fixed item, and run it over a few hundred generated ones.
+
 ```js
-// item = { id, q, reveal, opts: [{ t, ok, why }] }. Compute t and why from your data.
+// Flags the two tells that let a learner pass without the knowledge.
+function mcLint(item) {
+  const len = o => o.t.replace(/<[^>]+>/g, "").length;
+  const right = item.opts.find(o => o.ok), wrongs = item.opts.filter(o => !o.ok);
+  const longestWrong = Math.max(...wrongs.map(len));
+  const problems = [];
+  if (len(right) > 1.2 * longestWrong && len(right) - longestWrong > 6) problems.push("right option is clearly the longest");
+  if (wrongs.some(o => !o.why)) problems.push("a wrong option has no explanation");
+  return problems;
+}
+```
+
+```js
+// item = { id, q, reveal, keepOrder, opts: [{ t, ok, why }] }. Compute t and why from your data.
 function choice(el, item, onDone) {
   const name = "c" + Math.random().toString(36).slice(2);
+  const opts = item.keepOrder ? item.opts : shuffle([...item.opts]);
   const fs = h("fieldset", { class: "q" }, h("legend", { html: item.q }));
-  item.opts.forEach((o, i) => fs.append(
+  opts.forEach((o, i) => fs.append(
     h("label", { class: "opt" },
       h("input", { type: "radio", name, value: i }),
       h("span", { html: o.t }))));
@@ -205,14 +243,14 @@ function choice(el, item, onDone) {
   btn.onclick = () => {
     const sel = fs.querySelector("input:checked");
     if (!sel) { fb.className = "fb"; fb.textContent = "Pick one first. A guess counts."; return; }
-    const o = item.opts[+sel.value];
+    const o = opts[+sel.value];
     record(item.id, o.ok, o.t);
     say(fb, o.ok, o.why);
     if (o.ok || item.reveal) {
       fs.querySelectorAll("input").forEach(x => (x.disabled = true));
       btn.disabled = true;
       if (!o.ok) {
-        const right = item.opts.find(x => x.ok);
+        const right = opts.find(x => x.ok);
         fb.append(h("p", { html: `<strong>Answer:</strong> ${right.t}. ${right.why}` }));
       }
       if (onDone) onDone(o.ok);
@@ -237,26 +275,40 @@ choice($("#hook"), {
 });
 ```
 
-**Variant retry.** For practice, wrap the same component in a generator so a miss produces a fresh item and the learner needs a streak:
+**Variant retry, ending on mastery.** For practice, wrap the same component in a generator so a miss produces a fresh item. The part ends when a mastery criterion is met (here, `need` right in a row, counting only items flagged as discriminating), not after a set number of items, and an "I've got this, test me" button offers one hard item that finishes the part if it's right:
 
 ```js
-// make() returns a fresh { q, opts } computed from data each call.
-function practice(el, { id, make, need = 2 }) {
+// make() returns a fresh { q, opts, counts } from data; counts is false for a
+// deliberately non-discriminating item (section 5.8), which never advances the streak.
+// challenge() returns one hard item that discriminates every named misconception.
+function practice(el, { id, make, need = 3, challenge }) {
   let streak = 0;
-  const next = () => {
-    const holder = h("div");
+  const finish = msg => { markDone(id); el.replaceChildren(h("p", { text: msg })); };
+  const next = (maker = make, isTest = false) => {
+    const holder = h("div"), item = maker();
     el.replaceChildren(holder);
-    choice(holder, { ...make(), id, reveal: true }, ok => {
-      streak = ok ? streak + 1 : 0;
-      if (streak >= need) { markDone(id); el.append(h("p", { text: `${need} in a row. This part is done.` })); return; }
-      el.append(h("button", { type: "button", class: "btn", text: ok ? "Next one" : "Try a fresh one", onclick: next }));
+    choice(holder, { ...item, id, reveal: true }, ok => {
+      if (isTest && ok) return finish("Challenge passed. This part is done.");
+      if (isTest || !ok) streak = 0;
+      else if (item.counts !== false) streak++;
+      if (streak >= need) return finish(`${need} in a row. This part is done.`);
+      el.append(h("p", { class: "note", text: isTest ? "Not this time, so back to practice." : `${streak} of ${need} in a row.` }),
+        h("button", { type: "button", class: "btn", text: ok ? "Next one" : "Try a fresh one", onclick: () => next() }));
     });
+    if (challenge && !isTest)
+      el.append(h("button", { type: "button", class: "btn quiet", text: "I've got this, test me", onclick: () => next(challenge, true) }));
   };
   next();
 }
 
 practice($("#halving"), {
-  id: "halving", need: 2,
+  id: "halving", need: 3,
+  // 1,024 items: "log2 of 1,024 is 10" is the misconception, but 10 guesses cover only 1,023.
+  challenge: () => ({ q: "Worst case for binary search over 1,024 sorted items?", opts: [
+    { t: "11", ok: true, why: "10 guesses cover 2 to the 10th minus 1 = 1,023 items. One more item needs an 11th guess." },
+    { t: "10", ok: false, why: "That's log2(1,024). But 10 guesses cover only 1,023 items, one short." },
+    { t: "9", ok: false, why: "9 guesses cover only 511 items." },
+  ] }),
   make() {
     const n = [50, 120, 700, 3000, 64000][Math.floor(Math.random() * 5)];
     const k = Math.ceil(Math.log2(n + 1));
@@ -568,6 +620,73 @@ async function copyForClaude(task, textarea, status) {
 
 Clipboard writes fail in some sandboxed frames and on `file://` in some browsers, so the fallback (select the text) is required, not optional. Show the rubric next to the box so the learner can self-check first.
 
+### 5.8 Generators that discriminate
+
+**Use for** every generated placement, practice, mastery and retrieval item. The principle and the recipe are in `diagnosis-and-feedback.md`, section 13: an item tests a misconception only if the misconception gives a different answer. A random generator left alone produces many items where the wrong rule and the right one agree (in iteration 1, three in four), and a learner holding the wrong rule clears practice uncontradicted.
+
+The mechanics: write the correct engine and each named misconception as functions of the same item, draw until the item separates them, let a capped share of non-discriminating items through on purpose (flagged so they never count toward mastery), measure the rate, and use the misconception answers both as distractors and to name the error in a typed answer.
+
+```js
+// Worked on order of operations so it runs anywhere. Swap in your engine and misconceptions.
+const genExpr = () => ({ a: Math.floor(Math.random() * 10), b: Math.floor(Math.random() * 10), c: Math.floor(Math.random() * 10) });
+const RIGHT = ({ a, b, c }) => a + b * c;
+const WRONG = {
+  leftToRight: ({ a, b, c }) => (a + b) * c,   // "work left to right"
+  addAll: ({ a, b, c }) => a + b + c,          // "the x is another plus"
+};
+const WHY = {
+  leftToRight: "is what you get working left to right. Multiplication goes first, so b times c is done before the addition.",
+  addAll: "is what you get adding all three. The middle sign multiplies.",
+};
+
+// Draw until no misconception matches the right answer. weakShare lets a few
+// non-discriminating items through so "the obvious answer is always wrong" isn't a strategy.
+function pickItem(gen, right, wrong, { weakShare = 0.15, tries = 1000 } = {}) {
+  const allowWeak = Math.random() < weakShare;
+  for (let i = 0; i < tries; i++) {
+    const item = gen(), answer = right(item);
+    const blind = Object.keys(wrong).filter(k => wrong[k](item) === answer);
+    if (!blind.length || allowWeak) return { item, answer, blind, counts: !blind.length };
+  }
+  throw new Error(`No discriminating item in ${tries} draws. Widen the generator.`);
+}
+
+// Measure, don't assume: the share of raw draws each misconception would get wrong.
+function discriminationRate(gen, right, wrong, n = 3000) {
+  const hit = Object.fromEntries(Object.keys(wrong).map(k => [k, 0]));
+  for (let i = 0; i < n; i++) { const it = gen(), a = right(it); for (const k in wrong) if (wrong[k](it) !== a) hit[k]++; }
+  return Object.fromEntries(Object.entries(hit).map(([k, v]) => [k, +(v / n).toFixed(2)]));
+}
+console.log("raw generator", discriminationRate(genExpr, RIGHT, WRONG));
+console.log("filtered", discriminationRate(() => pickItem(genExpr, RIGHT, WRONG, { weakShare: 0 }).item, RIGHT, WRONG));
+
+// Multiple choice: the wrong options are the misconception answers, each with its explanation.
+function exprItem() {
+  const { item, answer, counts } = pickItem(genExpr, RIGHT, WRONG);
+  const { a, b, c } = item, seen = new Set([answer]);
+  const opts = [{ t: String(answer), ok: true, why: `${b} times ${c} is ${b * c}, then add ${a}.` }];
+  for (const k in WRONG) {
+    const v = WRONG[k](item);
+    if (!seen.has(v)) { seen.add(v); opts.push({ t: String(v), ok: false, why: `${v} ${WHY[k]}` }); }
+  }
+  return { q: `What is ${a} + ${b} × ${c}?`, opts, counts };
+}
+
+// Typed answers: name the misconception the answer matches, if any.
+function diagnoseTyped(item, typed) {
+  const v = Number(typed), right = RIGHT(item);
+  if (v === right) return { ok: true, why: "Multiplication first, then the addition." };
+  const k = Object.keys(WRONG).find(k => WRONG[k](item) === v);
+  return { ok: false, why: k ? `${v} ${WHY[k]}` : `The answer is ${right}: ${item.b} times ${item.c} first, then add ${item.a}.` };
+}
+```
+
+On a raw draw here, `leftToRight` is caught about 80% of the time (it agrees whenever `a` is 0 or `c` is 1) and `addAll` about 98% (it agrees only when `b` and `c` are both 0 or both 2); filtered, both are 100%. If filtering rejects most draws, the generator is aimed at the wrong region: change it to build discriminating items directly (for a "whole stack versus run" misconception, always place a lone stone beside a run), then filter what's left.
+
+**Mastery and the streak.** `practice()` in 5.1 counts only items with `counts !== false`. The challenge item should separate every misconception at once.
+
+**Also run it on fixed items.** For the hook, each placement item and the final check, add one line per item to the page's `checks` array asserting that the right answer differs from each misconception's (section 10).
+
 ## 6. Honor-system patterns for physical skills
 
 The page can't observe a motor skill, so the check is observable criteria plus an external reference plus honest self-report, and the self-report changes the plan. See `artifact-blueprint.md` section 12 for the design; this is the mechanics.
@@ -728,14 +847,59 @@ function paintMap() {
 
 ## 10. Checking the built page
 
+### Fact checks at load
+
+Generating the content from data fixes the diagrams and the answer keys. It does not fix the sentences written beside them, and in iteration 1 every factual error in the stronger fretboard lesson was one of those: a lick said to finish in box 2 that ended in box 1, "a bass root on beats 1 and 3" over code that played the fifth on beat 3, and a 60 bpm goal beside a "70 bpm (the objective)" rung. So the page carries a short list of assertions, one per stated fact the code could contradict, and runs it at load.
+
+What goes in it:
+
+- **Every hand-written sentence that names a value about computed content.** Where a sequence starts or ends, which beat plays which note, a count, a total, which option is longest, which rows survive.
+- **Goal constants read in more than one place:** the objective's tempo against the top rung, the streak length in the text against the code's.
+- **Each fixed item's discrimination:** the hook, the placement items, the challenge item (section 5.8).
+- **Each fixed multiple-choice item's lint** (`mcLint`, section 5.1).
+
+```js
+// One line per stated fact. Text should still read from data where it can;
+// this list catches the sentences that can't, and the ones someone forgets.
+const DEV = location.protocol === "file:" || new URLSearchParams(location.search).has("dev");
+const checks = [
+  ["hook: 1,000 names need at most 10 guesses", () => guesses(1000) === 10],
+  ["hook: '500' really is the half-the-list misconception", () => 1000 / 2 === 500],
+  // Shapes of the checks that would have caught iteration 1's errors:
+  // ["lick ends in box 2, as the text says", () => boxOf(LICK.at(-1)).includes(2)],
+  // ["bass plays the root on beats 1 and 3", () => [0, 2].every(b => BASS_PC[b] === ROOT_PC)],
+  // ["objective tempo is the top rung's", () => GOAL_BPM === RUNGS.at(-1).bpm],
+  // ["hook stack separates whole-stack doubling", () => wrong.wholeStack(HOOK) !== score(HOOK)],
+];
+function runChecks() {
+  const fails = checks.filter(([, f]) => { try { return !f(); } catch (e) { return true; } }).map(([t]) => t);
+  fails.forEach(t => console.error("Fact check failed:", t));
+  if (DEV && fails.length) document.body.prepend(h("pre", { role: "alert", text: "Fact checks failed:\n" + fails.join("\n") }));
+  return fails;
+}
+runChecks();
+```
+
+The headless run in the list below treats any "Fact check failed" in the console as a failure. A check that fails means the sentence or the data is wrong; fix whichever is wrong, and never delete the check to get a clean run.
+
+### Trace the prose
+
+Then read the rendered page once, slowly, as the learner, and stop at every sentence that names a specific value: a number, a position, a note or a row, "first", "last", "only", "every", "longest". For each, point to what guarantees it: the script fills it in, or a line in `checks` asserts it. A sentence with neither gets one, or is rewritten without the value. Read the generated feedback the same way, for several random items: generated text is where a wrong pronoun, a "two orders" that should be a count, or a stale label shows up.
+
+Self-check criteria get the same trace against the domain: work one real case through each "you've got it when…" line and ask whether a correct performance could fail it (`diagnosis-and-feedback.md`, section 11).
+
+### In a browser
+
 A model doesn't see its own rendered output, so open it. If a headless browser is available (Python Playwright, or Chrome's headless mode), check:
 
 1. **Console errors** and uncaught exceptions: none, at load and through every interaction.
-2. **Layout at 1280, 390 and 320 px,** in light and dark: no page-level horizontal scroll (`document.documentElement.scrollWidth <= clientWidth`); wide diagrams scroll inside their own container only. Look at the screenshots, don't just measure: overlapping fixed buttons, borders running through legends and stretched table rows only show up visually.
-3. **Play through every interaction by script:** a wrong answer then a right one for each check, the variant streak, the "not yet" path twice, the retrieval schedule. Read the feedback text it produces; generated explanations are where a stray "each" with one name or a wrong pronoun shows up.
-4. **Verify content independently:** compute a sample of answers by a separate route (a Python one-off) and compare with what the page renders.
-5. **Storage blocked:** load once with `localStorage` throwing; the page must still work.
-6. **Timing-driven parts** (metronomes): speed them up in the test (`RUNGS.forEach(r => r.bpm = 900)`), and launch the browser with `--autoplay-policy=no-user-gesture-required` so the audio clock runs.
+2. **Layout at 1280, 390 and 320 px,** in light and dark: no page-level horizontal scroll (`document.documentElement.scrollWidth <= clientWidth`), and **no sideways scroll in the core task's container** either (the same test on the diagram or builder the main check uses). Headless Chrome's smallest window can be about 500 px, so load the page in a 390 px iframe or use device emulation to get a true phone width. Look at the screenshots, don't just measure: overlapping fixed buttons, borders running through legends and stretched table rows only show up visually.
+3. **The longest strings.** Find the longest value each text slot can take (the longest option, legend, feedback message, generated name) and render it at 320 px. It must wrap inside its box.
+4. **Play through every interaction by script:** a wrong answer then a right one for each check, the variant streak, the "not yet" path twice, the retrieval schedule. Read the feedback text it produces; generated explanations are where a stray "each" with one name or a wrong pronoun shows up.
+5. **Verify content independently:** compute a sample of answers by a separate route (a Python one-off) and compare with what the page renders.
+6. **Run the fact checks:** `runChecks()` returns an empty list and the console has no "Fact check failed". Print each generator's `discriminationRate` and confirm the non-discriminating share is small.
+7. **Storage blocked:** load once with `localStorage` throwing; the page must still work.
+8. **Timing-driven parts** (metronomes): speed them up in the test (`RUNGS.forEach(r => r.bpm = 900)`), and launch the browser with `--autoplay-policy=no-user-gesture-required` so the audio clock runs.
 
 Then run the no-slop-design skill's `scripts/audit.py` on the file and walk its checklist by hand for the judgment items. Fix every failure; most warnings are worth fixing too. In the examples the audit caught a too-amber string color and a false positive where a comparison written as i, less-than, S.rung with no spaces looked like a strikethrough tag; rewriting the comparison was simpler than arguing with it.
 
@@ -755,14 +919,19 @@ If no browser is available, say so in the hand-over, and say which checks were d
 - [ ] Two typefaces, each with a stated job; none of the banned six.
 - [ ] Paragraph measure 60 to 75 characters; spacing groups each chunk; one idea per region; something deliberately asymmetric.
 - [ ] Light and dark themes both designed; toggle stored with try/catch.
-- [ ] No page scroll at 390 and 320 px; 44 px hit targets; print styles for anything that will be printed.
+- [ ] No page scroll at 390 and 320 px, and the core task needs no sideways scroll there (rotate, crop or zoom wide diagrams); 44 px hit targets; print styles for anything that will be printed.
+- [ ] No colored left border on callouts, feedback or route boxes.
+- [ ] The longest string in every text slot wraps inside its container at 320 px; legends don't cross their fieldset border.
 - [ ] Motion only for state changes; reduced-motion respected.
 
 **Interaction**
 - [ ] Every widget is a think pattern with all five states (idle, attempted, wrong with explanation, right, retry) and is referenced by a step.
 - [ ] No answer on screen before commitment; checking with nothing chosen gives a prompt, not silence.
 - [ ] Wrong feedback says what the learner's answer actually means; right feedback says why.
-- [ ] Variants after misses; streaks to finish; misses recorded with what was answered.
+- [ ] Variants after misses; misses recorded with what was answered.
+- [ ] Generators filtered to discriminating items, rate measured; non-discriminating items flagged and never counted toward mastery.
+- [ ] Practice ends on a mastery criterion, with an "I've got this, test me" challenge.
+- [ ] Multiple choice: options similar in length and grammar, wrong options from named misconceptions, order shuffled, `mcLint` clean.
 - [ ] Keyboard: native controls, roving tabindex for diagrams, buttons as the primary move controls for ordering; visible focus everywhere.
 - [ ] Feedback regions are `aria-live="polite"`; time limits adjustable and never enforced by auto-advance.
 - [ ] Learner text never inserted as HTML.
@@ -772,7 +941,9 @@ If no browser is available, say so in the hand-over, and say which checks were d
 - [ ] Diagrams generated from the same data as the text, with a text alternative and stated orientation.
 
 **Verified**
-- [ ] Opened in a headless browser: no console errors, layout checked at three widths in both themes, every interaction played through, generated text read.
+- [ ] A `checks` array asserts every stated fact the code could contradict and every fixed item's discrimination; it passes at load.
+- [ ] Every sentence naming a value traced to the code or check that guarantees it.
+- [ ] Opened in a headless browser: no console errors, layout checked at three widths in both themes, core task played through at 390 px, every interaction played through, generated text read.
 - [ ] no-slop audit script run with zero failures; judgment checklist walked.
 
 <!--
@@ -785,5 +956,6 @@ Sources and findings behind this file:
 - research/baseline/fretboard-teardown/01 to 03: unused synth (F20), tool-island tools (F22), ear trainer without cadence (F23), right/wrong-only feedback (F24), forward-only review (F25), fretboard overflow at narrow widths, tab orientation flips (F36).
 - no-slop-design skill: SKILL.md four decisions; references/visual.md (palette, type, layout, decoration), copy.md (no em dashes, banned vocabulary, explanatory filler), craft.md (states, accessibility baseline, responsive widths), audit-checklist.md.
 - WCAG 2.2 AA: 1.4.3 and 1.4.11 contrast, 2.1.1 keyboard, 2.2.1 timing adjustable, 1.4.2 audio control.
+- testing/reports/iter-1*.md: fact checks at load and tracing the prose (fretboard G2 errors), discriminating generators (Driftstones generator rate, hook collision), mastery exit (learner quit at level 4), option hygiene (longest option correct), phone-width core task (min-width boards), left-border and legend overflow (audit warnings, grader screenshots). Practitioner.
 - Practitioner or v0: the visual adaptations, the five-state model, the code sketches (tested by extraction into a headless-browser test page), the honor-system ladder mechanics.
 -->

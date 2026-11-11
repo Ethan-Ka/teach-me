@@ -69,6 +69,8 @@ Match the effort to the job:
 
 Then verify. Compute or run every worked example. Generate examples and their answer keys from one source of truth (one function that knows the fretboard, one query run against real data, one script that does the algebra) so the lesson and its key can't disagree. A hedge like "double-check this before trusting it" is not a check. If you can't verify something, say so plainly. If you have no web access, say so in one line and compute everything you can.
 
+**Verify the prose too.** Once the examples are computed, the errors move into the sentences written beside them. In a blind test, every factual error in a lesson with a correct engine was a hand-written sentence describing generated content: "the lick finishes in box 2" when the page's own table showed it ending in box 1, "a bass root on beats 1 and 3" when beat 3 played the fifth, and a 60 bpm goal in one place and 70 in another. Any sentence that names a specific value (where something ends, which beat plays which note, a count, a tempo, a row total) is either generated from the data or asserted against it. Goals stated in two places must match. In an artifact, keep a small `checks` array of assertions that runs at load and compares each stated fact with the computed data; then, before shipping, read every sentence that names a value and trace it to its source (`references/artifact-craft.md`, section 10).
+
 When a video would help, point to a specific segment with a timestamp you've confirmed, give one thing to predict before watching and one thing to do after. A video supplements the teaching; it doesn't replace it.
 
 Detail: `references/topic-research.md`.
@@ -155,6 +157,8 @@ Feedback helps to the degree it carries information about the work. In a meta-an
 
 **Design the self-check well, where it isn't.** For guitar, drawing, sport, pronunciation and other physical skills, you can't see or hear the learner, and self-assessment is part of the deal. Make it good: observable criteria ("five clean changes in a row at 60 bpm, no buzzing strings"), a tempo ladder, record-and-compare against a reference, a prediction before the check, an honest "not yet" path that changes the next step, and a short report back to you ("2 of 5 clean, buzz on the G string"). Say plainly what you can't observe.
 
+**Check each criterion against the domain.** A "you've got it when…" line is a claim about the subject, and it can be wrong. One lesson told a blues learner to end bar 12 on the root, but bar 12 is the V chord, where the root sounds like a suspended fourth against the bass, and the page's next prompt told the learner that a note fighting the bass was a mistake. Ask of every criterion: can a correct performance fail it, or a wrong one pass it? If either can happen, rewrite it.
+
 **Confront misconceptions; don't just assert the right answer.** On topics where people bring wrong intuitions (physics, probability, statistics, pointers and references, concurrency), have the learner commit to a prediction a misconception would get wrong, let it collide with the case, then explain using their answer. Tell them that confusion at this step is normal and productive. For example:
 
 > **Learner:** so after `b = a`, b is a copy of a?
@@ -162,6 +166,8 @@ Feedback helps to the degree it carries information about the work. In a meta-an
 > **Claude:** Let's test it. `a = [1, 2]`, then `b = a`, then `a.append(3)`. Before you run it: what does `print(b)` show?
 
 If they say `[1, 2]`, running it shows `[1, 2, 3]`, and now "two names, one list" answers a question they're holding instead of being a rule you asserted. Ask the same question later with integers, where it behaves differently, so the new model doesn't overreach.
+
+**Pick cases that discriminate.** A probe only tests a misconception if the misconception gives a different answer from the right rule on that case. Before you ask, work the case both ways: the right way and the way each likely wrong idea would. If they agree, the learner holding the wrong idea gets told "right" and leaves more confident. Change the case until they disagree. In a blind test, a lesson's opening question scored the same under the correct rule and the planted misconception, so it confirmed the error it was built to catch. Recipe: `references/diagnosis-and-feedback.md`, section 13.
 
 Detail: `references/diagnosis-and-feedback.md`.
 
@@ -191,15 +197,22 @@ The visual is that turn's scaffold, so it still pairs with one focused question.
 **Before building any lesson, course, study guide, quiz, interactive explainer or "page to learn X from", read `references/artifact-blueprint.md` and `references/artifact-craft.md`.** Worked examples of good artifacts are in `references/artifact-examples/`. The usual failure is a reference document: accurate, organized, and nearly useless for learning, because reading it feels like understanding without producing any. The essentials:
 
 - **Ask first.** Two or three questions in chat: their goal, their time, what they can already do. Then put a short placement check in the artifact anyway, because self-report is unreliable.
+- **Placement changes the path.** A placement result that only prints advice leaves a strong learner doing every step anyway. Make it route: collapse the parts they placed out of (with a "do it anyway" button), or start the practice at a later level.
 - **Scope to mastery, not coverage.** Build the first unit or first one to three objectives the learner can reach in the next few sessions. Offer the rest as a map, and build later units after they report back. The failed guitar course shipped 96 lessons nobody could finish.
 - **A path, not a pile.** Outcome statement, a hook that asks for a prediction, chunks of one idea each (worked example, then a check), faded practice, a transfer task, then mixed retrieval at the end. Reference material goes in a collapsed appendix.
 - **Every interactive element asks the learner something.** A widget that only displays is decoration. A tool no step points to won't be used.
 - **The learner commits before any answer appears.** Never print the answer above the exercise that asks them to derive it.
 - **Checks that can fail.** For checkable domains, the page validates and explains each wrong answer. For physical skills, observable criteria, "not yet" paths and a report-back box. No "mark done" button as the only gate. Review must be able to record a miss.
+- **Items that discriminate.** Every diagnostic and practice item is one where the likely misconceptions give a different answer from the right rule. Random generators are filtered to keep such items (section 7), or a learner with the wrong model can clear practice without ever being contradicted.
+- **Mastery ends practice.** Stop on a criterion such as three right in a row on discriminating items, not after a fixed number of levels, and offer "I've got this, test me" with one hard item. A simulated learner quit a well-built lesson from tedium two levels before its own finish line.
+- **Final retrieval is production in a new context.** The learner types, builds or plays the answer for a new key, new tables, a new input. Multiple choice that could be answered at page load measures recognition.
+- **Drills exercise the target skill.** Ask whether the task can be done by a shortcut that skips the skill (adding fret offsets instead of seeing the neck, pattern-matching an option's length). If it can, change the task.
+- **Multiple-choice hygiene.** Options of similar length and grammar, wrong options built from named misconceptions, and the right option's position shuffled. Learners pick the longest option, and it works more often than it should.
 - **Separate the move-on bar from the mastery bar.** A reachable "good enough to continue," with mastery pushed into spaced review.
-- **Verify all content before publishing**, from a single source of truth (section 3).
+- **Verify all content before publishing**, from a single source of truth, prose included (section 3).
+- **The core task works on a phone.** At 390 px the main interaction needs no sideways scrolling. Rotate a wide diagram, crop it to the relevant region, or zoom to the active range.
 - **Stay in what a page can do.** In-page JavaScript, stored answers, small test runners, local storage. No microphone pitch detection, computer vision or backends. Route anything else through the chat ("paste your attempt back to me").
-- **Read it once as the learner before shipping.** Check counts, cross-references, duplicates, truncated sentences, terms used before they're defined, and leftover authoring notes.
+- **Read it once as the learner before shipping.** Check counts, cross-references, duplicates, truncated sentences, terms used before they're defined, and leftover authoring notes. Trace every sentence that names a value to the data it describes.
 
 Use the environment's artifact or file tooling for the build. If you can't create artifacts or files, give the lesson inline as a sequence of short steps, each ending in something for the learner to do.
 
@@ -260,11 +273,22 @@ Check your draft reply or artifact against this list. The last group comes from 
 11. *Boilerplate advice* stamped onto every step. It teaches the learner to skim the advice that matters.
 12. *Physical risks a teacher would catch,* left unnamed or made into pass requirements. Name them, add a self-check, never require the risky movement.
 
+**In artifacts that look good (iteration 1 blind test).** Lessons built with this skill beat the baseline clearly, and still failed in these ways. The common thread: a clear, well-structured lesson isn't evidence of learning. Only checks that can tell a right model from a wrong one are, and a simulated learner who held the planted misconception was told "Right." by the opening question.
+13. *Prose not checked against computed content.* Every factual error came from a hand-written sentence beside a correct engine. Generate or assert every stated value (section 3).
+14. *Items the misconception also answers correctly.* 75% of one generator's items gave the same answer under the wrong rule, so a learner holding it cleared practice uncontradicted more than half the time. Filter generators to discriminating items.
+15. *Placement that advises but never routes, and practice that runs past mastery.* Skip what placement shows they know; stop on a mastery criterion.
+16. *Recognition as the final check.* Multiple choice in familiar settings. End with production in a new context.
+17. *Self-check criteria wrong for the domain.* "End bar 12 on the root" over a V chord. Check every criterion against the subject.
+18. *Wide diagrams that scroll sideways on a phone,* in the very task the lesson is built around.
+19. *Test-taking tells.* The longest option was the right one, and the learner said so.
+20. *Drills a shortcut can pass.* Fret arithmetic standing in for seeing the neck.
+
 **Before you send a teaching turn, check:**
 - Will the learner have to produce something after reading this? If they only read, add a prediction, a step or a choice.
 - Did I give away the answer they were about to find?
 - Is this one level of support, matched to their last answer?
 - Is every fact, output and number in it verified?
+- Would someone holding the likely misconception answer my question differently from someone who has it right?
 - Is there exactly one question, and did I stop after it?
 
 **Things not to build on:** learning styles (matching format to "visual" or "auditory" learners doesn't improve learning); "you remember 10% of what you read" (the numbers trace to an uncited 1967 article); mindset slogans in place of feedback (average effects are weak); rereading and highlighting as a study plan (rated low utility). Say instead what has evidence: retrieval practice and spacing work, and active practice beats passive review.
@@ -288,11 +312,11 @@ The general process holds everywhere, but a few domains bend it. Read the domain
 | File | Read it when |
 |---|---|
 | `references/gradual-release.md` | Choosing between tell, guide and do; the learner keeps missing or keeps succeeding; designing worked examples, faded practice or an attempt-first problem |
-| `references/diagnosis-and-feedback.md` | Choosing a diagnostic probe; the learner says "got it" and you doubt it; writing feedback or hints; designing a check (checkable or honor-system); a known misconception is in play |
+| `references/diagnosis-and-feedback.md` | Choosing a diagnostic probe; the learner says "got it" and you doubt it; writing feedback or hints; designing a check (checkable or honor-system); a known misconception is in play; choosing items that tell a right model from a wrong one |
 | `references/retention.md` | Closing a session; planning review across days; the learner says it "won't stick"; mixing practice on confusable ideas; making flashcards or a quiz |
 | `references/topic-research.md` | Before teaching a topic properly or building any artifact; finding and using educator videos; verifying examples and answer keys; working without web access |
 | `references/artifact-blueprint.md` | Before building any lesson, course, study guide or interactive page: the parts and their order |
-| `references/artifact-craft.md` | Before building any artifact: interaction patterns, in-page checks, state, and what a page can and can't do |
+| `references/artifact-craft.md` | Before building any artifact: interaction patterns, discriminating generators, in-page checks and fact assertions, phone layouts, state, and what a page can and can't do |
 | `references/artifact-examples/` | When you want a model of a finished learning artifact |
 | `references/domains/programming.md` | Teaching code, debugging, a new language, or a codebase |
 | `references/domains/math.md` | Teaching math or quantitative methods |

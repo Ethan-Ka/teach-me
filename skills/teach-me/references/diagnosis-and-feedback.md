@@ -16,8 +16,9 @@ How Claude finds out where the learner is, notices when understanding is an illu
 10. Checkable domains: actually check
 11. Honor-system domains: design the self-check
 12. Confronting misconceptions
-13. Before-and-after feedback examples
-14. Evidence notes
+13. Items that discriminate
+14. Before-and-after feedback examples
+15. Evidence notes
 
 ---
 
@@ -123,7 +124,7 @@ Use at a transition point. A multiple-choice or short-answer item where each wro
 - (c) means they're carrying a block-scope model from another language (in Python the loop variable survives the loop).
 - (d) is honest and useful: teach it directly.
 
-A good hinge question is quick, every option is plausible, and it gets the right answer for the right reason. In chat, a single hinge question is weak evidence on its own, so pair it with one short "why?"
+A good hinge question is quick, every option is plausible, and it gets the right answer for the right reason. That last condition is the one drafts miss: if a misconception also lands on the right option, the question can't see it (section 13). In chat, a single hinge question is weak evidence on its own, so pair it with one short "why?"
 
 ## 3. Plan the next move before you ask
 
@@ -280,7 +281,11 @@ For guitar and other instruments, sport, drawing, dance, pronunciation, typing, 
 
 **8. Say what you can't see.** "I can't hear you play, so I'm going on what you tell me. If something sounds off and you can't say what, record it and describe the moment it goes wrong."
 
-**9. If they can share a recording, photo or video**, and your environment can take one, use it. Say what you can and can't judge from it. Don't make confident claims about technique you can't check.
+**9. Check every criterion against the domain.** A criterion is a claim about the subject, and it can be false. A blues lesson's criterion "your last note of bars 4, 8 and 12 is the root" fails on bar 12, which is the V chord (E7 in the key of A): the key's root, A, sits a fourth above the bass there and sounds like a suspended chord, and the page's next prompt said a note that fought the bass was a mistake, so a learner who followed the criterion was taught to doubt it. For each criterion, ask two questions. Can a correct performance fail it? Can a wrong one pass it? Work one real case through it (the actual chord in that bar, the actual note the page plays). If either answer is yes, narrow the criterion ("the root on bars 4 and 8, where the I chord plays; on bar 12, the V chord, land on that chord's root, the key's fifth") or replace it.
+
+**10. Check the drill exercises the skill.** A drill is valid only if the target skill is the easiest way to pass it. Look for a shortcut: in one fretboard lesson the learner typed lick frets as the root fret plus fixed offsets (+0, +3, +5), which is arithmetic, while the objective was seeing the notes on the neck. If a shortcut exists, change the task so it doesn't work: ask for a note's position on the board without giving the root fret, have them click it on a diagram, vary the shape so the offsets change, or time it so recomputing is too slow. The same check applies to checkable domains (a SQL drill where the row count is always "rows in the left table" can be passed without understanding the join).
+
+**11. If they can share a recording, photo or video**, and your environment can take one, use it. Say what you can and can't judge from it. Don't make confident claims about technique you can't check.
 
 ## 12. Confronting misconceptions
 
@@ -311,7 +316,27 @@ Don't just assert the right answer over the top of a wrong one. The wrong one su
 | Algebra | Exponents distribute over addition | "Is (a + b)² equal to a² + b²? Try a = 1, b = 2." |
 | Git | Rebase moves commits (rather than creating new ones) | "After rebase, are X and Y the same commits? Check the hashes." |
 
-## 13. Before-and-after feedback examples
+## 13. Items that discriminate
+
+An item tests a misconception only if the misconception gives a different answer from the right rule on that item. Otherwise a learner holding the wrong idea gets "Right." and leaves more confident. Clear explanations already leave wrong beliefs in place (section 12); a check that confirms them makes it worse.
+
+This is the most common way a well-built lesson fails. In a blind test of an invented scoring game whose learners were primed with "doubling applies to the whole stack, not just the run", the lesson's opening hook used a stack where both rules gave 18, so it told the misconception holder "Right." Its runs practice generator produced mostly single-colour stacks (BBB, RRR), where the two rules agree: 75% of items couldn't detect the misconception, and a learner holding it cleared "two in a row" without being contradicted about 56% of the time (0.75 squared). The lesson looked thorough, and the one error it was built to catch slipped through.
+
+**The recipe.** It works in chat and in an artifact.
+
+1. **Name the misconceptions** for the idea, two to four of them (from `topic-research.md`, or the usual wrong ideas).
+2. **Write each one as a rule you can apply.** "Every neighbouring letter is two frets apart"; "LEFT JOIN returns one row per left row"; "double the whole stack". In an artifact this is literally a function beside the correct engine: `wrong.allTwoFrets(note)`, `wrong.wholeStack(stack)`.
+3. **Work each candidate item under every rule.** Correct answer, and the answer each misconception gives.
+4. **Keep items where the answers diverge.** An item is discriminating for a misconception when that misconception's answer differs from the right one. Prefer items that separate several misconceptions at once.
+5. **Allow a minority of non-discriminating items, on purpose.** A few items where the rules agree stop the learner from inferring "the obvious answer is always wrong". Keep them under about a quarter, and never use one for a placement item, the hook, a mastery streak or the final check.
+6. **Use the divergent answers.** In multiple choice, the misconception answers are the wrong options, each with its own explanation. In typed items, compare the learner's answer with each misconception's answer and name the one it matches: "18 is what you get by doubling every stone. Only stones inside a run double."
+7. **Measure the rate.** For a generator, sample a few thousand items and print the share that discriminates for each misconception. A rate you didn't measure hasn't been checked. JavaScript for steps 2 to 7: `artifact-craft.md`, section 5.8.
+
+**In chat**, step 3 is a moment of private work before the question: "If they think every letter is two frets apart, they'll say F is at fret 2. Good, that separates." If the case doesn't separate, change the numbers before asking.
+
+**Placement and mastery depend on it.** A placement item that the misconception answers correctly routes a learner past the part that would fix it. A streak of three on non-discriminating items is three coin flips the wrong model wins. Mastery criteria count only discriminating items.
+
+## 14. Before-and-after feedback examples
 
 **Code**
 
@@ -337,7 +362,7 @@ Don't just assert the right answer over the top of a wrong one. The wrong one su
 >
 > After: "3 of 5 clean at 60 is real progress from 1 of 5 yesterday. The misses are both on the G string, which points at your ring finger. Try 20 slow placements of that finger alone, then 5 changes at 50. Tell me how many are clean."
 
-## 14. Evidence notes
+## 15. Evidence notes
 
 - Hinge-question design: Moderate (Wiliam, via a teacher-facing summary). Probe list as a set: Practitioner.
 - Performance vs learning, illusions of learning: Moderate (Bjork, via APS Observer; Dunlosky et al. 2013 on rereading).
@@ -346,5 +371,7 @@ Don't just assert the right answer over the top of a wrong one. The wrong one su
 - Self-check design for checkable and honor-system domains: Practitioner, built on the feedback and practice-testing evidence and on the fretboard teardown.
 - Misconception confrontation: Moderate (Muller et al. 2008 via two secondary descriptions; Muller's own video, transcript opened). One topic, immediate test.
 - Misconception table entries: Practitioner; well known, verify the specific probes before use.
+- Discriminating items (section 13): Moderate for the principle (Wiliam's hinge-question rule that an item must "elicit the right response for the right reason", with distractors that reflect different misconceptions). The recipe, the quarter cap on non-discriminating items, and the measured-rate step are Practitioner, from the iteration 1 blind test (`testing/reports/iter-1-grading-driftstones.md`).
+- Criterion validity and drill validity (section 11, items 9 and 10): Practitioner, from the same test (`testing/reports/iter-1-grading-fretboard.md`).
 
-<!-- Sources: research/notes/B-diagnosis-feedback.md (probes, illusion signals, feedback levels and meta-analysis, timing, checkable vs honor-system checks); research/notes/C-expert-tutoring.md (Graesser "does that make sense", INSPIRE indirect feedback, expert vs novice turns); research/notes/D-retention.md finding 5 (self-testing design); research/notes/E-artifact-design.md findings 3 and 5 (Muller, self-checks by domain); research/notes/I-video-educators.md finding 2 (Muller check); research/notes/F-domain-pedagogy.md (feedback on physical skill without observation, v0); research/notes/H-myths.md (fluency is not learning, mindset); research/baseline/fretboard-teardown/01-instructional-design.md F17-F19, F24, F25, root causes 4 and 8; 02-learner-walkthrough.md (honor-system-progress, unverifiable-self-check, quit point); 03-guitar-teacher.md lessons 7 and 9. -->
+<!-- Sources: research/notes/B-diagnosis-feedback.md (probes, illusion signals, feedback levels and meta-analysis, timing, checkable vs honor-system checks); research/notes/C-expert-tutoring.md (Graesser "does that make sense", INSPIRE indirect feedback, expert vs novice turns); research/notes/D-retention.md finding 5 (self-testing design); research/notes/E-artifact-design.md findings 3 and 5 (Muller, self-checks by domain); research/notes/I-video-educators.md finding 2 (Muller check); research/notes/F-domain-pedagogy.md (feedback on physical skill without observation, v0); research/notes/H-myths.md (fluency is not learning, mindset); research/baseline/fretboard-teardown/01-instructional-design.md F17-F19, F24, F25, root causes 4 and 8; 02-learner-walkthrough.md (honor-system-progress, unverifiable-self-check, quit point); 03-guitar-teacher.md lessons 7 and 9; testing/reports/iter-1.md and the two grading reports (non-discriminating hook and generator, bar-12 criterion, arithmetic drill). -->
