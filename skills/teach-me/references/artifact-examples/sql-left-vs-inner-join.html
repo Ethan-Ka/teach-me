@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LEFT vs INNER JOIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Palette: green-bar printout paper (the thing query results used to come out on).
+   Band tint for alternating result rows, near-black ribbon ink, one blue action color. */
+:root{
+  --bg:#fbfbf8;--surface:#fff;--band:#e6efe2;--ink:#1c211e;--muted:#4f5a53;--rule:#c4cfc6;
+  --accent:#1d4f7a;--on-accent:#fff;--ok:#2f5d2a;--bad:#9a2f22;--focus:#1d4f7a;
+  --sans:"Source Sans 3","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:6px;color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#131715;--surface:#1a1f1c;--band:#1f2a22;--ink:#e4e9e5;--muted:#a9b5ad;--rule:#3a473e;
+  --accent:#9cc3ec;--on-accent:#0d1a26;--ok:#9fd096;--bad:#f2a395;--focus:#9cc3ec;color-scheme:dark}}
+:root[data-theme=dark]{
+  --bg:#131715;--surface:#1a1f1c;--band:#1f2a22;--ink:#e4e9e5;--muted:#a9b5ad;--rule:#3a473e;
+  --accent:#9cc3ec;--on-accent:#0d1a26;--ok:#9fd096;--bad:#f2a395;--focus:#9cc3ec;color-scheme:dark}
+*{box-sizing:border-box}
+html{font-size:106.25%}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 var(--sans)}
+a{color:var(--accent)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--surface);padding:.5rem}
+.wrap{display:grid;grid-template-columns:13rem minmax(0,40rem);grid-template-rows:auto 1fr;gap:3.5rem;max-width:62rem;padding:3rem 1.5rem 6rem;margin:0 auto 0 max(0px,calc((100vw - 66rem)/3))}
+header.top{grid-column:2}
+h1{font-size:2.35rem;line-height:1.1;margin:0 0 .75rem;font-weight:700}
+h2{font-size:1.45rem;line-height:1.25;margin:0 0 .5rem}
+h3{font-size:1.05rem;margin:1.75rem 0 .4rem}
+p,li{max-width:66ch}
+.who{color:var(--muted);margin:0 0 1.25rem}
+.goals{margin:0;padding-left:1.2rem}.goals li{margin:.25rem 0}
+code,pre,.mono{font-family:var(--mono);font-size:.86em}
+pre{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:.75rem 1rem;overflow-x:auto;line-height:1.5}
+nav.map{grid-row:1/span 2;position:sticky;top:1.5rem;align-self:start;font-size:.92rem}
+nav.map ol{list-style:none;margin:0;padding:0}
+nav.map li{margin:0;padding:.35rem 0 .35rem .75rem;border-inline-start:2px solid var(--rule)}
+nav.map li[aria-current]{border-color:var(--accent);font-weight:700}
+nav.map a{color:var(--ink);text-decoration:none}nav.map a:hover{text-decoration:underline}
+nav.map .st{display:block;color:var(--muted);font-weight:400;font-size:.85rem}
+.mapnote{color:var(--muted);font-size:.85rem;margin-top:1rem}
+main{grid-column:2}
+section.part{padding:2.75rem 0 0;margin-top:2.75rem;border-top:1px solid var(--rule)}
+section.part>p:first-of-type{margin-top:0}
+.tables{display:flex;flex-wrap:wrap;align-items:flex-start;gap:1.25rem 2rem;margin:1rem 0}
+table{border-collapse:collapse;font-family:var(--mono);font-size:.85rem;background:var(--surface)}
+caption{text-align:left;font-family:var(--sans);font-weight:600;font-size:.9rem;padding-bottom:.25rem}
+th,td{padding:.3rem .7rem;text-align:left;border-bottom:1px solid var(--rule)}
+th{font-weight:600}
+tbody tr:nth-child(even){background:var(--band)}
+td.null{color:var(--muted);font-style:italic}
+.trace td:last-child{font-family:var(--sans)}
+.q{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);padding:1rem 1.15rem 1.1rem;margin:1.25rem 0;min-width:0}
+.q legend{font-weight:600;padding:0 .3rem;max-width:62ch}
+.opt{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem .5rem;border-radius:4px;cursor:pointer}
+.opt:hover{background:var(--band)}
+.opt input{margin-top:.35rem;accent-color:var(--accent)}
+.opt.was-wrong{color:var(--muted)}
+.opt.was-wrong span::after{content:" (your earlier pick)";font-size:.85em}
+.row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-top:.75rem}
+.btn{font:600 .95rem var(--sans);min-height:44px;padding:.55rem 1.1rem;border-radius:var(--r);border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;transition:filter .12s}
+.btn:hover{filter:brightness(1.1)}.btn:active{filter:brightness(.92)}
+.btn.quiet{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.fb{margin-top:.75rem}.fb:empty{display:none}
+.fb .verdict{font-weight:700}
+.fb.ok .verdict{color:var(--ok)}.fb.no .verdict{color:var(--bad)}
+.fb p{margin:.3rem 0}
+label.inline{display:inline-flex;gap:.4rem;align-items:center;margin-right:1rem}
+select,input[type=text],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--muted);border-radius:4px;padding:.35rem .5rem;min-height:40px}
+input[type=number]{width:5rem}
+textarea{width:100%;min-height:7rem;font-family:var(--mono);font-size:.85rem}
+.builder{font-family:var(--mono);font-size:.88rem;line-height:2.4}
+.builder select{font-family:var(--mono);font-size:.88rem}
+.note{color:var(--muted);font-size:.93rem}
+.route{border-inline-start:3px solid var(--accent);padding:.25rem 0 .25rem 1rem;margin:1rem 0}
+.theme{position:fixed;top:.75rem;right:.75rem;font-size:.85rem;min-height:44px}
+details{margin-top:1rem}summary{cursor:pointer;font-weight:600}
+footer{grid-column:2;margin-top:4rem;color:var(--muted);font-size:.9rem}
+@media (max-width:860px){
+  .wrap{display:block;padding:4rem 1rem 5rem;margin:0}
+  nav.map{position:static;margin:1.5rem 0 0;border-top:1px solid var(--rule);padding-top:1rem}
+  nav.map ol{display:flex;flex-wrap:wrap;gap:.25rem 1rem}
+  nav.map li{border:0;padding:.2rem 0}
+  nav.map li[aria-current] a{text-decoration:underline;text-decoration-thickness:2px}
+  nav.map .st{display:none}
+  h1{font-size:1.9rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .theme,.btn,nav.map,.skip{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{display:block;padding:0}
+  section.part{break-inside:avoid-page}
+  details{display:block}details>*{display:block}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the lesson</a>
+<button class="btn quiet theme" type="button" id="theme">Dark theme</button>
+<div class="wrap">
+<header class="top">
+  <h1>LEFT vs INNER JOIN</h1>
+  <p class="who">For you if you can write <code>SELECT ... WHERE</code> on one table and joins still feel like guessing. About 25 minutes.</p>
+  <p><strong>By the end you will be able to:</strong></p>
+  <ol class="goals">
+    <li>Predict the exact rows, duplicates and NULLs included, that an INNER and a LEFT JOIN return from two small tables.</li>
+    <li>Write the query that finds rows with no match, and say why a <code>WHERE</code> filter on the right-hand table quietly undoes a LEFT JOIN.</li>
+  </ol>
+</header>
+<nav class="map" aria-label="Lesson progress"><ol id="map"></ol><p class="mapnote" id="mapnote"></p></nav>
+<main id="main">
+
+<section class="part" id="place" aria-labelledby="h-place">
+  <h2 id="h-place">Placement: where should you start?</h2>
+  <p>Four questions on a tiny pet database. "Not sure" is a real answer: it routes you, it doesn't count against you.</p>
+  <div class="tables" id="petTables"></div>
+  <div id="placeQs"></div>
+  <div id="placeRoute" class="route" hidden></div>
+</section>
+
+<section class="part" id="p1" aria-labelledby="h-p1">
+  <h2 id="h-p1">Part 1: Commit to a guess</h2>
+  <p>These are the two tables for the rest of the lesson. <span id="orphanNote"></span></p>
+  <div class="tables" id="mainTables"></div>
+<pre>SELECT c.name, o.id, o.total
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id;</pre>
+  <div id="hookQ"></div>
+</section>
+
+<section class="part" id="p2" aria-labelledby="h-p2">
+  <h2 id="h-p2">Part 2: INNER JOIN, traced by hand</h2>
+  <p>A join is a loop. For each customer, find every order whose <code>customer_id</code> equals that customer's <code>id</code>, and write one output row per match. That's all INNER JOIN does. A customer with no match writes nothing.</p>
+  <div id="innerTrace"></div>
+  <div id="innerQ"></div>
+</section>
+
+<section class="part" id="p3" aria-labelledby="h-p3">
+  <h2 id="h-p3">Part 3: LEFT JOIN, you fill in the gaps</h2>
+  <p>LEFT JOIN runs the same loop with one change: a left-table row with zero matches still writes <strong>one</strong> row, and every column from the right table is NULL. The matched customers below are already done for you.</p>
+  <div id="leftTrace"></div>
+  <h3>Now on tables you haven't seen</h3>
+  <p>New random orders each time. Get two in a row to finish this part. A miss shows you the trace and gives you a fresh pair of tables.</p>
+  <div id="variant"></div>
+</section>
+
+<section class="part" id="p4" aria-labelledby="h-p4">
+  <h2 id="h-p4">Part 4: The WHERE trap</h2>
+  <p>You want every customer, plus only their big orders. Here's the query most people write first.</p>
+<pre>SELECT c.name, o.id, o.total
+FROM customers c
+LEFT JOIN orders o ON c.id = o.customer_id
+WHERE o.total &gt; 20;</pre>
+  <div id="trapQ"></div>
+  <div id="trapAfter" hidden>
+    <p>The order of operations is the whole story. The join runs first and produces the <span data-n="left"></span> rows from Part 1. Then <code>WHERE</code> looks at each row. On Bo's row <code>o.total</code> is NULL, and <code>NULL &gt; 20</code> isn't true (it's unknown), so the row goes. LEFT JOIN protected Bo during the join; WHERE threw him out afterward.</p>
+    <p>Move the condition into <code>ON</code> and it becomes part of the matching instead:</p>
+<pre>LEFT JOIN orders o ON c.id = o.customer_id AND o.total &gt; 20</pre>
+    <div id="onFix"></div>
+    <p class="note" id="onNote"></p>
+  </div>
+</section>
+
+<section class="part" id="p5" aria-labelledby="h-p5">
+  <h2 id="h-p5">Part 5: Build the "no orders" query</h2>
+  <p>Goal: list the customers who have never ordered. Assemble the query, run it, and the page compares your result to the goal.</p>
+  <div class="q builder" id="builder"></div>
+</section>
+
+<section class="part" id="p6" aria-labelledby="h-p6">
+  <h2 id="h-p6">Part 6: Same idea, new tables</h2>
+  <p>A shop has <code>products(id, name)</code> and <code>order_items(order_id, product_id, qty)</code>. Write a query that lists the names of products nobody has ever ordered. No builder this time.</p>
+  <label for="transfer" class="note">Your SQL</label>
+  <textarea id="transfer" spellcheck="false"></textarea>
+  <div class="row"><button class="btn" type="button" id="copyT">Copy it for Claude</button><span id="copyMsg" class="note" role="status"></span></div>
+  <p class="note">The page can't run free-form SQL. Paste it into the chat and Claude will check it against these three points; or check it yourself first: (1) products is on the left of a LEFT JOIN; (2) the ON compares <code>products.id</code> to <code>order_items.product_id</code>; (3) the WHERE tests a right-table column with <code>IS NULL</code>.</p>
+</section>
+
+<section class="part" id="p7" aria-labelledby="h-p7">
+  <h2 id="h-p7">Part 7: From memory</h2>
+  <p>Don't scroll up. These mix everything. Getting one wrong here is useful: it brings your next review forward.</p>
+  <div id="retr"></div>
+  <div id="review" class="route" hidden></div>
+</section>
+
+<section class="part" id="ref" aria-labelledby="h-ref">
+  <h2 id="h-ref">Reference</h2>
+  <details><summary>Syntax and the rule in one table</summary>
+<pre>SELECT ...
+FROM left_table l
+[INNER | LEFT] JOIN right_table r ON l.key = r.key
+WHERE ...;          -- runs after the join</pre>
+  <table><thead><tr><th scope="col">Left row has</th><th scope="col">INNER writes</th><th scope="col">LEFT writes</th></tr></thead>
+  <tbody><tr><td>0 matches</td><td>nothing</td><td>1 row, right side NULL</td></tr><tr><td>n matches</td><td>n rows</td><td>n rows</td></tr></tbody></table>
+  </details>
+</section>
+</main>
+<footer>Every row count, result table and answer on this page is computed by the small join engine in the page's script from the tables shown, so the text and the answers can't drift apart. Your progress is stored in this browser only.</footer>
+</div>
+<script>
+"use strict";
+/* ---------- data: the single source for every table, answer and explanation ---------- */
+const CUST=[{id:1,name:"Ana",city:"Lisbon"},{id:2,name:"Bo",city:"Oslo"},{id:3,name:"Cyd",city:"Lima"},{id:4,name:"Dee",city:"Oslo"}];
+const ORD=[{id:101,customer_id:1,total:30},{id:102,customer_id:1,total:12},{id:103,customer_id:3,total:50},{id:104,customer_id:5,total:9}];
+const OWN=[{id:1,name:"Kai",city:"Oslo"},{id:2,name:"Lu",city:"Lima"},{id:3,name:"Mo",city:"Oslo"}];
+const PET=[{id:7,owner_id:1,name:"Rex"},{id:8,owner_id:1,name:"Tom"},{id:9,owner_id:3,name:"Ivy"},{id:10,owner_id:3,name:"Ash"}];
+
+/* join(type, left, right, on, where): SQL semantics. WHERE sees NULL right rows as o===null,
+   and any comparison against NULL is not true, so the predicates below must return false for null. */
+function join(type,L,R,on,where){
+  const out=[];
+  for(const l of L){const m=R.filter(r=>on(l,r));
+    if(m.length)m.forEach(r=>out.push({l,r}));else if(type==="LEFT")out.push({l,r:null});}
+  return where?out.filter(where):out;
+}
+const byCust=(c,o)=>c.id===o.customer_id;
+const names=rows=>rows.map(x=>x.l.name);
+const count=(arr,v)=>arr.filter(x=>x===v).length;
+
+/* ---------- tiny DOM helper ---------- */
+function h(tag,a={},...kids){const e=document.createElement(tag);
+  for(const[k,v]of Object.entries(a)){if(k==="html")e.innerHTML=v;else if(k==="text")e.textContent=v;else if(k.startsWith("on"))e[k]=v;else e.setAttribute(k,v);}
+  e.append(...kids);return e;}
+const $=id=>document.getElementById(id);
+function table(cap,cols,rows){
+  const t=h("table");t.append(h("caption",{text:cap}));
+  const tr=h("tr");cols.forEach(c=>tr.append(h("th",{scope:"col",text:c[0]})));t.append(h("thead",{},tr));
+  const tb=h("tbody");rows.forEach(r=>{const row=h("tr");cols.forEach(c=>{const v=c[1](r);row.append(v===null?h("td",{class:"null",text:"NULL"}):h("td",{text:String(v)}));});tb.append(row);});
+  t.append(tb);return t;}
+const resultTable=(cap,rows)=>table(cap,[["name",x=>x.l.name],["o.id",x=>x.r?x.r.id:null],["o.total",x=>x.r?x.r.total:null]],rows);
+const custTable=(c,cap="customers")=>table(cap,[["id",x=>x.id],["name",x=>x.name],["city",x=>x.city]],c);
+const ordTable=(o,cap="orders")=>table(cap,[["id",x=>x.id],["customer_id",x=>x.customer_id],["total",x=>x.total]],o);
+
+/* ---------- progress: evidence, misses included ---------- */
+const KEY="teachme-joins-v1";let S={};
+try{S=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){S={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function record(part,ok){const r=S[part]||(S[part]={tries:0,miss:0,done:false});r.tries++;if(!ok)r.miss++;save();paintMap();}
+function done(part){(S[part]||(S[part]={tries:0,miss:0})).done=true;save();paintMap();}
+const PARTS=[["place","Placement"],["p1","1 Guess"],["p2","2 INNER"],["p3","3 LEFT"],["p4","4 WHERE trap"],["p5","5 Build it"],["p6","6 New tables"],["p7","7 From memory"]];
+function paintMap(){
+  const ol=$("map");ol.innerHTML="";let cur=null;
+  PARTS.forEach(([id,label])=>{const r=S[id];
+    const st=!r?"not started":r.done?(r.miss?`done, ${r.miss} miss${r.miss>1?"es":""} on the way`:"done"):`${r.tries} tr${r.tries>1?"ies":"y"}, ${r.miss} missed`;
+    const li=h("li",{},h("a",{href:"#"+id,text:label}),h("span",{class:"st",text:st}));
+    if(!cur&&!(r&&r.done)){cur=id;li.setAttribute("aria-current","step");}
+    ol.append(li);});
+  $("mapnote").textContent=S.nextReview?`Next review: ${new Date(S.nextReview).toLocaleDateString()}`:"";
+}
+
+/* ---------- choice question: idle, attempted, wrong (explained), right, retry ---------- */
+let uid=0;
+function choice(el,item,onRight){
+  // item: {part, q, opts:[{t, ok, why}], reveal:true for predictions (one commit, then show all)}
+  el.innerHTML="";const name="q"+(++uid);
+  const fs=h("fieldset",{class:"q"});fs.append(h("legend",{html:item.q}));
+  item.opts.forEach((o,i)=>{const lab=h("label",{class:"opt"});lab.append(h("input",{type:"radio",name,value:i}),h("span",{html:o.t}));fs.append(lab);});
+  const btn=h("button",{class:"btn",type:"button",text:item.reveal?"Lock in my guess":"Check"});
+  const fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
+  fs.append(h("div",{class:"row"},btn),fb);el.append(fs);
+  btn.onclick=()=>{
+    const sel=fs.querySelector("input:checked");
+    if(!sel){fb.className="fb";fb.textContent="Pick one first. A guess is fine; committing is the point.";return;}
+    const o=item.opts[+sel.value];if(item.part)record(item.part,o.ok);
+    fb.className="fb "+(o.ok?"ok":"no");fb.innerHTML="";
+    fb.append(h("p",{class:"verdict",text:o.ok?"Right.":"Not this one."}),h("p",{html:o.why}));
+    if(o.ok||item.reveal){
+      fs.querySelectorAll("input").forEach(i=>i.disabled=true);btn.disabled=true;
+      if(!o.ok){const r=item.opts.find(x=>x.ok);fb.append(h("p",{html:"<strong>Answer:</strong> "+r.t+". "+r.why}));}
+      if(onRight)onRight(o.ok);
+    }else{sel.closest(".opt").classList.add("was-wrong");sel.disabled=true;sel.checked=false;btn.textContent="Check again";}
+  };
+}
+
+/* ---------- placement ---------- */
+$("petTables").append(table("owners",[["id",x=>x.id],["name",x=>x.name],["city",x=>x.city]],OWN),table("pets",[["id",x=>x.id],["owner_id",x=>x.owner_id],["name",x=>x.name]],PET));
+const byOwner=(o,p)=>o.id===p.owner_id;
+const pIn=join("INNER",OWN,PET,byOwner).length,pLeft=join("LEFT",OWN,PET,byOwner).length;
+const oslo=OWN.filter(o=>o.city==="Oslo").map(o=>o.name).join(", ");
+const PQ=[
+ {k:"pre",q:"<code>SELECT name FROM owners WHERE city = 'Oslo'</code> returns:",ans:oslo,opts:[oslo,OWN[0].name,OWN.map(o=>o.name).join(", ")]},
+ {k:"inner",q:"<code>owners INNER JOIN pets ON owners.id = pets.owner_id</code> returns how many rows?",ans:String(pIn),opts:[String(pIn),String(OWN.length),String(OWN.length*PET.length)]},
+ {k:"left",q:"The same with <code>LEFT JOIN</code> returns how many rows?",ans:String(pLeft),opts:[String(pLeft),String(OWN.length),String(OWN.length+PET.length)]},
+ {k:"anti",q:"Which finds owners with no pets?",ans:"LEFT JOIN ... WHERE pets.id IS NULL",opts:["LEFT JOIN ... WHERE pets.id IS NULL","INNER JOIN ... WHERE pets.id IS NULL","LEFT JOIN ... WHERE pets.name &lt;&gt; 'Rex'"]}
+];
+(function placement(){
+  const box=$("placeQs");const form=h("div");const picks={};
+  PQ.forEach((p,i)=>{const fs=h("fieldset",{class:"q"});fs.append(h("legend",{html:(i+1)+". "+p.q}));
+    [...new Set(p.opts)].concat(["Not sure"]).forEach(t=>{const lab=h("label",{class:"opt"});const r=h("input",{type:"radio",name:"pl"+i,value:t});r.onchange=()=>picks[p.k]=t;lab.append(r,h("span",{html:t}));fs.append(lab);});
+    form.append(fs);});
+  const btn=h("button",{class:"btn",type:"button",text:"Show my starting point"});
+  box.append(form,h("div",{class:"row"},btn));
+  btn.onclick=()=>{
+    const ok=k=>picks[k]===PQ.find(p=>p.k===k).ans;
+    const R=$("placeRoute");R.hidden=false;
+    let msg;
+    if(!ok("pre"))msg="Start with one-table queries first. Question 1 is the base this lesson stands on; ask Claude for a ten-minute primer on <code>SELECT ... WHERE</code>, then come back to Part 1.";
+    else if(ok("inner")&&ok("left")&&ok("anti"))msg="You already predict both joins and know the anti-join. Skip to <a href='#p4'>Part 4, the WHERE trap</a>, then do Part 7. Parts 1 to 3 stay open if you want them.";
+    else if(ok("inner")&&ok("left"))msg="Your row counting is solid. Start at <a href='#p4'>Part 4</a>; Part 5 is the one you missed.";
+    else msg="Start at <a href='#p1'>Part 1</a>. "+(ok("inner")?"Your INNER count was right; the LEFT one is what Parts 1 and 3 fix.":"Parts 2 and 3 build the counting method step by step.");
+    R.innerHTML=msg;
+    const right=["pre","inner","left","anti"].filter(ok).length;
+    S.place={tries:1,miss:4-right,done:true,score:right};save();paintMap();
+  };
+})();
+
+/* ---------- part 1: predict, then confront ---------- */
+$("mainTables").append(custTable(CUST),ordTable(ORD));
+const LEFT=join("LEFT",CUST,ORD,byCust),INNER=join("INNER",CUST,ORD,byCust);
+const multi=CUST.find(c=>count(names(INNER),c.name)>1).name;
+const none=CUST.filter(c=>!count(names(INNER),c.name)).map(c=>c.name);
+choice($("hookQ"),{part:"p1",reveal:true,q:"How many rows does this return? Guess before reading on.",opts:[
+ {t:String(CUST.length),ok:false,why:`That's the most common guess: "LEFT JOIN keeps every customer, so one row each." It keeps every customer <em>at least once</em>. ${multi} has two orders, so ${multi} appears twice.`},
+ {t:String(LEFT.length),ok:true,why:`One row per matching pair (${INNER.length}), plus one NULL row each for ${none.join(" and ")}, who have no orders.`},
+ {t:String(LEFT.length+1),ok:false,why:"You kept order 104 as well. LEFT JOIN keeps unmatched rows from the <em>left</em> table only; an order pointing at a missing customer is dropped."},
+ {t:String(INNER.length),ok:false,why:`That's the INNER JOIN count. LEFT also writes a row for ${none.join(" and ")}, who have no orders.`}
+]},()=>{const d=h("div");d.append(resultTable("result",LEFT));$("hookQ").append(d);done("p1");});
+
+/* ---------- part 2: worked trace, then a check ---------- */
+function trace(rows,type,blankNames=[]){
+  return table("the loop, one customer at a time",[["customer",x=>x.name],["orders that match",x=>{const m=ORD.filter(o=>byCust(x,o)).map(o=>o.id);return m.length?m.join(", "):"none";}],
+   ["rows written",x=>{if(blankNames.includes(x.name))return "?";const m=ORD.filter(o=>byCust(x,o)).length;return m?`${m} (one per match)`:(type==="LEFT"?"1, with o.id and o.total NULL":"0, so the customer disappears");}]],rows);
+}
+const tIn=trace(CUST,"INNER");tIn.classList.add("trace");$("innerTrace").append(tIn);
+$("innerTrace").append(resultTable("INNER JOIN result",INNER));
+choice($("innerQ"),{part:"p2",q:`Bo gets a new order, id 105. How many rows does the INNER JOIN return now?`,opts:[
+ {t:String(INNER.length+1),ok:true,why:"Bo now has one match, so he writes one row. Nothing else changes."},
+ {t:String(INNER.length),ok:false,why:"Bo now has a match, and every match writes a row."},
+ {t:String(INNER.length+2),ok:false,why:"Each match writes exactly one row. Bo's single order adds one, not two."}
+]},ok=>{if(ok)done("p2");});
+
+/* ---------- part 3: faded trace, then variants ---------- */
+(function faded(){
+  const box=$("leftTrace");const t=trace(CUST,"LEFT",none);t.classList.add("trace");box.append(t);
+  const fs=h("fieldset",{class:"q"});fs.append(h("legend",{text:`Fill the two ? rows: how many rows do ${none.join(" and ")} each write, and what is o.total on them?`}));
+  const nRows=h("select",{id:"fRows"});["choose","0","1","2"].forEach(v=>nRows.append(h("option",{value:v,text:v})));
+  const tot=h("select",{id:"fTot"});["choose","0","NULL","(no row)"].forEach(v=>tot.append(h("option",{value:v,text:v})));
+  fs.append(h("label",{class:"inline",for:"fRows",text:"rows each"}),nRows,h("label",{class:"inline",for:"fTot",text:" o.total"}),tot);
+  const fb=h("div",{class:"fb",role:"status","aria-live":"polite"});const b=h("button",{class:"btn",type:"button",text:"Check"});
+  fs.append(h("div",{class:"row"},b),fb);box.append(fs);
+  b.onclick=()=>{const ok=nRows.value==="1"&&tot.value==="NULL";record("p3f",ok);fb.className="fb "+(ok?"ok":"no");
+    fb.innerHTML=ok?"<p class='verdict'>Right.</p><p>Zero matches under LEFT means one row, with every right-table column NULL. Not 0: a total of 0 would mean an order that cost nothing.</p>"
+      :`<p class='verdict'>Not yet.</p><p>${nRows.value==="0"?"0 rows is what INNER writes. LEFT's one change is that a customer with zero matches still writes a row.":"Each of them writes exactly one row."} ${tot.value==="0"?"And 0 is a number, a real order total. There's no order here, so the value is NULL.":tot.value==="NULL"?"":"The row exists, and its right-table columns are NULL."}</p>`;};
+})();
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+let streak=0,vseed=Date.now()%100000;
+function makeVariant(){
+  const r=rng(vseed++);
+  for(;;){const n=3+Math.floor(r()*4);const o=[];
+    for(let i=0;i<n;i++)o.push({id:201+i,customer_id:r()<.15?9:1+Math.floor(r()*4),total:5+Math.floor(r()*60)});
+    const cnt=CUST.map(c=>o.filter(x=>x.customer_id===c.id).length);
+    if(cnt.some(x=>x===0)&&cnt.some(x=>x>1))return o;}
+}
+function variant(){
+  const box=$("variant");box.innerHTML="";const o=makeVariant();
+  const inn=join("INNER",CUST,o,byCust),lef=join("LEFT",CUST,o,byCust);
+  box.append(h("div",{class:"tables"},custTable(CUST),ordTable(o,"orders (new)")));
+  const fs=h("fieldset",{class:"q"});fs.append(h("legend",{text:"How many rows does each join return?"}));
+  const a=h("input",{type:"number",id:"vIn",min:"0",inputmode:"numeric"}),b=h("input",{type:"number",id:"vLeft",min:"0",inputmode:"numeric"});
+  fs.append(h("label",{class:"inline",for:"vIn",text:"INNER"}),a,h("label",{class:"inline",for:"vLeft",text:" LEFT"}),b);
+  const fb=h("div",{class:"fb",role:"status","aria-live":"polite"});const btn=h("button",{class:"btn",type:"button",text:"Check"});
+  fs.append(h("div",{class:"row"},btn,h("span",{class:"note",text:`In a row: ${streak} of 2`})),fb);box.append(fs);
+  btn.onclick=()=>{
+    if(a.value===""||b.value===""){fb.className="fb";fb.textContent="Enter both counts.";return;}
+    const ok=+a.value===inn.length&&+b.value===lef.length;record("p3",ok);
+    const per=CUST.map(c=>[c.name,o.filter(x=>x.customer_id===c.id).length]);
+    const why=`INNER: ${per.filter(p=>p[1]).map(p=>p[0]+" "+p[1]).join(" + ")} = ${inn.length}. LEFT: those ${inn.length}, plus one NULL row ${per.filter(p=>!p[1]).length>1?"each ":""}for ${per.filter(p=>!p[1]).map(p=>p[0]).join(" and ")} = ${lef.length}.`+(o.some(x=>x.customer_id===9)?" The order for customer 9 matches nobody, so neither join shows it.":"");
+    fb.className="fb "+(ok?"ok":"no");fb.innerHTML=`<p class="verdict">${ok?"Right.":"Not this time."}</p><p>${why}</p>`;
+    btn.disabled=true;streak=ok?streak+1:0;
+    if(streak>=2){done("p3");fb.append(h("p",{text:"Two in a row. Part 3 is done."}));return;}
+    fb.append(h("button",{class:"btn quiet",type:"button",text:ok?"Next tables":"Try new tables",onclick:variant}));
+  };
+}
+variant();
+
+/* ---------- part 4: the WHERE trap ---------- */
+const big=(x)=>x.r!==null&&x.r.total>20;
+const trap=join("LEFT",CUST,ORD,byCust,big);
+const onFix=join("LEFT",CUST,ORD,(c,o)=>byCust(c,o)&&o.total>20);
+{const orphan=ORD.filter(o=>!CUST.some(c=>c.id===o.customer_id));
+ $("orphanNote").textContent=orphan.map(o=>`Order ${o.id} points at customer ${o.customer_id}, who doesn't exist.`).join(" ");
+ document.querySelectorAll("[data-n=left]").forEach(e=>e.textContent=LEFT.length);
+ const lost=ORD.filter(o=>o.total<=20&&CUST.some(c=>c.id===o.customer_id&&onFix.some(x=>x.l===c&&x.r)));
+ $("onNote").textContent=lost.map(o=>{const c=CUST.find(c=>c.id===o.customer_id);const kept=onFix.find(x=>x.l===c).r;return `${c.name} has no NULL row here even though order ${o.id} (total ${o.total}) failed the test, because she still matched order ${kept.id}.`;}).join(" ")+" NULL rows appear only for customers with zero matches.";}
+choice($("trapQ"),{part:"p4",reveal:true,q:"How many rows come back?",opts:[
+ {t:String(LEFT.length),ok:false,why:"That's the belief that LEFT JOIN guarantees every customer appears. It does, during the join. WHERE runs afterward and can still remove them."},
+ {t:String(trap.length),ok:true,why:`Only rows with a total over 20 survive: ${trap.map(x=>x.l.name+" "+x.r.total).join(", ")}. Bo and Dee are gone, so the result is identical to an INNER JOIN with the same filter.`},
+ {t:String(onFix.length),ok:false,why:"That's what you'd get with the condition inside ON. In WHERE it behaves differently; see below."}
+]},()=>{$("trapAfter").hidden=false;$("onFix").append(resultTable("with the condition in ON",onFix));done("p4");});
+
+/* ---------- part 5: build and run ---------- */
+(function builder(){
+  const box=$("builder");const goal=join("LEFT",CUST,ORD,byCust,x=>x.r===null);
+  const sel=(id,opts)=>{const s=h("select",{id,"aria-label":id});opts.forEach(v=>s.append(h("option",{value:v,text:v})));return s;};
+  const J=sel("join type",["INNER JOIN","LEFT JOIN"]),O=sel("on condition",["c.id = o.customer_id","c.id = o.id"]),W=sel("where clause",["(no WHERE)","WHERE o.id IS NULL","WHERE o.id IS NOT NULL","WHERE o.total > 20"]);
+  box.append("SELECT c.name, o.id, o.total",h("br"),"FROM customers c",h("br"),J," orders o",h("br"),"ON ",O,h("br"),W);
+  const out=h("div");const fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
+  const run=h("button",{class:"btn",type:"button",text:"Run query"});box.append(h("div",{class:"row"},run),fb,out);
+  const preds={"(no WHERE)":null,"WHERE o.id IS NULL":x=>x.r===null,"WHERE o.id IS NOT NULL":x=>x.r!==null,"WHERE o.total > 20":big};
+  run.onclick=()=>{
+    const on=O.value==="c.id = o.id"?(c,o)=>c.id===o.id:byCust;
+    const res=join(J.value.split(" ")[0],CUST,ORD,on,preds[W.value]);
+    const ok=names(res).join()===names(goal).join();record("p5",ok);
+    out.innerHTML="";out.append(resultTable("your result",res));
+    let why;
+    if(ok)why=`Right: ${names(goal).join(" and ")}. LEFT JOIN gives the customers without orders a NULL row, and <code>IS NULL</code> keeps only those rows. It's called an anti-join.`;
+    else if(O.value==="c.id = o.id")why=`The ON compares customer ids (${CUST.map(c=>c.id).join(", ")}) with order ids (${ORD.map(o=>o.id).join(", ")}), which never match, so every customer looks order-less. Join on the column that holds the customer's id.`;
+    else if(J.value.startsWith("INNER"))why=W.value.includes("IS NULL")&&!W.value.includes("NOT")?"Zero rows. INNER JOIN already dropped the customers without orders, so there's no NULL row left for WHERE to find.":"INNER JOIN drops exactly the customers you're looking for. You need the join that keeps them.";
+    else if(W.value==="(no WHERE)")why="This is every customer, with and without orders. Add a WHERE that keeps only the NULL rows.";
+    else if(W.value.includes("NOT"))why="That keeps the matched rows, which is the INNER result. Flip the test.";
+    else why="That's the Part 4 trap: it keeps big orders and throws away the NULL rows you wanted.";
+    fb.className="fb "+(ok?"ok":"no");fb.innerHTML=`<p class="verdict">${ok?"Matches the goal.":"Doesn't match the goal yet."}</p><p>${why}</p>`;
+    if(ok)done("p5");
+  };
+})();
+
+/* ---------- part 6: transfer, checked by Claude ---------- */
+$("copyT").onclick=async()=>{
+  const sql=$("transfer").value.trim();if(!sql){$("copyMsg").textContent="Write your query first.";return;}
+  const msg=`I'm working through a LEFT vs INNER JOIN lesson. Transfer task: list products nobody has ever ordered, given products(id, name) and order_items(order_id, product_id, qty). My attempt:\n\n${sql}\n\nPlease check it, tell me what it returns and why, and give me one more problem like it if it's right.`;
+  try{await navigator.clipboard.writeText(msg);$("copyMsg").textContent="Copied. Paste it into the chat.";}
+  catch(e){$("transfer").value=msg;$("transfer").select();$("copyMsg").textContent="Copy blocked here: the message is selected in the box, press Ctrl or Cmd+C.";}
+  done("p6");
+};
+
+/* ---------- part 7: mixed retrieval that schedules the next review ---------- */
+(function retrieval(){
+  const box=$("retr");let answered=0,missed=0;
+  const ST=[{id:1,name:"Ola",city:""},{id:2,name:"Pim",city:""},{id:3,name:"Rin",city:""}];
+  const CL=[{id:1,customer_id:2,total:0},{id:2,customer_id:2,total:0},{id:3,customer_id:2,total:0}];
+  const n=join("LEFT",ST,CL,byCust).length;
+  const qs=[
+   {q:`Students Ola, Pim and Rin. Pim belongs to 3 clubs, the others to none. <code>students LEFT JOIN memberships</code> returns how many rows?`,opts:[
+     {t:String(n),ok:true,why:"Pim writes 3 rows (one per match); Ola and Rin write one NULL row each."},
+     {t:"3",ok:false,why:"That counts one row per student. Pim has three matches, so Pim alone writes three."},
+     {t:"4",ok:false,why:"Ola and Rin each write their own NULL row: 3 for Pim plus 2."}]},
+   {q:"Which line makes a LEFT JOIN behave like an INNER JOIN?",opts:[
+     {t:"<code>WHERE o.total &gt; 0</code>",ok:true,why:"A WHERE comparison on a right-table column is never true on a NULL row, so the unmatched rows vanish."},
+     {t:"<code>ON c.id = o.customer_id AND o.total &gt; 0</code>",ok:false,why:"Inside ON, the condition only changes which orders match. Unmatched customers still get their NULL row."},
+     {t:"<code>WHERE o.id IS NULL</code>",ok:false,why:"That keeps only the unmatched rows: the opposite of INNER."}]},
+   {q:"An INNER JOIN of customers and orders can return more rows than the customers table has.",opts:[
+     {t:"True",ok:true,why:"One row per matching pair. A customer with 5 orders writes 5 rows."},
+     {t:"False",ok:false,why:"The Venn-diagram picture suggests a join is a filter on one table. It's a pairing: each match is a row, so counts can grow."}]},
+   {q:"You need customers who have never ordered. Which do you write?",opts:[
+     {t:"<code>LEFT JOIN ... WHERE o.id IS NULL</code>",ok:true,why:"Keep everyone, then keep only the rows with no match."},
+     {t:"<code>INNER JOIN ... WHERE o.id IS NULL</code>",ok:false,why:"INNER removed them before WHERE ran. Zero rows."},
+     {t:"<code>LEFT JOIN ... WHERE o.total = NULL</code>",ok:false,why:"<code>= NULL</code> is never true in SQL, not even for NULL. Use <code>IS NULL</code>."}]}
+  ];
+  qs.forEach((it,i)=>{const d=h("div");box.append(d);
+    choice(d,Object.assign({reveal:true},it,{q:(i+1)+". "+it.q}),ok=>{answered++;if(!ok)missed++;if(answered===qs.length)finish();});});
+  function finish(){
+    const prev=S.p7&&S.p7.done;const days=missed?1:(S.reviewGap?Math.min(S.reviewGap*2,30):3);
+    S.reviewGap=missed?1:days;S.nextReview=Date.now()+days*864e5;
+    S.p7={tries:((S.p7&&S.p7.tries)||0)+1,miss:((S.p7&&S.p7.miss)||0)+missed,done:true};save();paintMap();
+    const R=$("review");R.hidden=false;
+    R.innerHTML=`<strong>${qs.length-missed} of ${qs.length} from memory.</strong> `+(missed?`Come back tomorrow (${new Date(S.nextReview).toLocaleDateString()}) and redo this part; misses come back sooner.`:`Come back in ${days} days (${new Date(S.nextReview).toLocaleDateString()}). Nothing will remind you, so put it in your calendar now.`)+(prev?"":" If you'd rather, ask Claude for a fresh set of these then.");
+  }
+})();
+
+/* ---------- theme ---------- */
+(function(){const b=$("theme");let t=null;try{t=localStorage.getItem("teachme-theme");}catch(e){}
+  const apply=v=>{if(v)document.documentElement.dataset.theme=v;const dark=v?v==="dark":matchMedia("(prefers-color-scheme: dark)").matches;b.textContent=dark?"Light theme":"Dark theme";};
+  apply(t);b.onclick=()=>{const dark=b.textContent==="Light theme";const v=dark?"light":"dark";try{localStorage.setItem("teachme-theme",v);}catch(e){}apply(v);};})();
+paintMap();
+</script>
+</body>
+</html>

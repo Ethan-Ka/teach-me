@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes on the Low Strings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Palette from the instrument: bone nut (page), rosewood board (ink, diagram),
+   nickel hardware (the one action color, a steel blue). */
+:root{
+  --bg:#f7f4ef;--surface:#fffdfa;--ink:#241a16;--muted:#5c4f48;--rule:#d8cfc6;
+  --accent:#2c4a5e;--on-accent:#fff;--ok:#36572f;--bad:#9b2c1d;
+  --board:#3a2620;--fret:#b9b4ac;--string:#d6d2cb;--pearl:#e8e2d6;--dot:#fffdfa;
+  --serif:"Source Serif 4",Georgia,serif;--ui:"Atkinson Hyperlegible",system-ui,sans-serif;--r:5px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#17110f;--surface:#201816;--ink:#efe7df;--muted:#b6a89e;--rule:#3e302b;
+  --accent:#9ec3dc;--on-accent:#10202b;--ok:#a8cf98;--bad:#f0a08f;--board:#33221c;--dot:#efe7df;color-scheme:dark}}
+:root[data-theme=dark]{
+  --bg:#17110f;--surface:#201816;--ink:#efe7df;--muted:#b6a89e;--rule:#3e302b;
+  --accent:#9ec3dc;--on-accent:#10202b;--ok:#a8cf98;--bad:#f0a08f;--board:#33221c;--dot:#efe7df;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:1.0625rem/1.65 var(--serif)}
+h1,h2,h3,legend,.btn,nav,label,.ui,table,select,input{font-family:var(--ui)}
+.skip{position:absolute;left:-999px}.skip:focus{left:1rem;top:1rem;background:var(--surface);padding:.5rem}
+.wrap{max-width:46rem;margin:0 auto 0 max(1rem,calc((100vw - 46rem)/4));padding:3rem 1.25rem 6rem}
+h1{font-size:2.4rem;line-height:1.08;margin:0 0 .8rem}
+h2{font-size:1.4rem;line-height:1.25;margin:0 0 .5rem}
+h3{font-size:1.05rem;margin:1.75rem 0 .3rem}
+p,li{max-width:64ch}
+.who{color:var(--muted);margin-top:0}
+.goal{font-size:1.1rem;border-block:1px solid var(--rule);padding:.9rem 0;margin:1.25rem 0}
+nav.map{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--rule);margin:0 -1.25rem;padding:.6rem 1.25rem;font-size:.9rem}
+nav.map ol{display:flex;flex-wrap:wrap;gap:.2rem 1.1rem;list-style:none;margin:0;padding:0}
+nav.map a{color:var(--muted);text-decoration:none}
+nav.map li[aria-current] a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+nav.map .done a{color:var(--ink)}
+nav.map .done a::after{content:" (done)";color:var(--muted);font-weight:400}
+section{padding-top:2.5rem;margin-top:2.5rem;border-top:1px solid var(--rule);scroll-margin-top:3rem}
+.board{overflow-x:auto;margin:1rem 0;-webkit-overflow-scrolling:touch}
+.board svg{display:block;min-width:600px;width:100%;height:auto}
+.board .spot{cursor:pointer}
+.board .spot:focus{outline:none}.board .spot:focus-visible .ring{stroke:var(--accent);stroke-width:3}
+.q{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);padding:1rem 1.1rem;margin:1.25rem 0;min-width:0}
+.q legend{font-weight:700;padding:0 .3rem}
+.opt{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem .5rem;border-radius:4px;cursor:pointer;font-family:var(--ui)}
+.opt:hover{background:var(--bg)}
+.opt input{margin-top:.35rem;accent-color:var(--accent)}
+.opt.was-wrong{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:.75rem}
+.btn{font-weight:700;font-size:.95rem;min-height:44px;padding:.5rem 1rem;border-radius:var(--r);border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;transition:filter .12s}
+.btn:hover{filter:brightness(1.12)}.btn:active{filter:brightness(.9)}
+.btn.quiet{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fb:empty{display:none}.fb{margin-top:.6rem}.fb p{margin:.25rem 0}
+.verdict{font-family:var(--ui);font-weight:700}
+.ok .verdict{color:var(--ok)}.no .verdict{color:var(--bad)}
+input[type=text],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--muted);border-radius:4px;padding:.3rem .45rem;min-height:40px}
+input.fret{width:3.6rem;text-align:center}
+textarea{width:100%;min-height:8rem;font-family:var(--ui);font-size:.92rem}
+.walk{font-family:var(--ui);border-collapse:collapse;margin:.75rem 0;font-size:.95rem}
+.walk td,.walk th{padding:.3rem .65rem;border-bottom:1px solid var(--rule);text-align:left}
+.walk td.n{font-variant-numeric:tabular-nums}
+.fade{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-family:var(--ui);align-items:end}
+.fade label,.fade .lbl{display:flex;flex-direction:column;align-items:center;font-weight:700}
+.fade .given{min-width:3.6rem;text-align:center;padding:.35rem 0;color:var(--muted)}
+.ladder{list-style:none;padding:0;margin:1rem 0;font-family:var(--ui)}
+.ladder li{display:grid;grid-template-columns:4.5rem 1fr auto;gap:.75rem;padding:.55rem 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.ladder li.cur{font-weight:700}
+.ladder .k{color:var(--muted);font-variant-numeric:tabular-nums}
+.ladder .s{color:var(--muted);font-weight:400;font-size:.9rem}
+.stage{background:var(--board);color:#f3ece3;border-radius:var(--r);padding:1.25rem;margin:1rem 0;font-family:var(--ui)}
+.stage .call{font-size:2.2rem;font-weight:700;line-height:1.1;min-height:2.6rem}
+.stage .sub{color:#cfc3b8;font-size:.95rem}
+.beats{display:flex;gap:.4rem;margin-top:.9rem}
+.beats span{width:2.2rem;height:.5rem;border-radius:2px;background:#937468;transition:background .06s}
+.beats span.on{background:#f3ece3}
+.note{color:var(--muted);font-size:.94rem}
+.plan{border-inline-start:3px solid var(--accent);padding:.2rem 0 .2rem 1rem;margin:1rem 0}.plan:empty{display:none}
+.theme{position:absolute;top:.6rem;right:.6rem;z-index:3}
+details summary{cursor:pointer;font-family:var(--ui);font-weight:700}
+footer{margin-top:4rem;color:var(--muted);font-size:.9rem}
+@media (max-width:600px){h1{font-size:1.95rem}.wrap{padding-top:4.25rem}.stage .call{font-size:1.7rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.theme,.btn,nav.map,.stage,.skip{display:none!important}body{background:#fff;color:#000}details>*{display:block}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the lesson</a>
+<button class="btn quiet theme" type="button" id="theme">Dark theme</button>
+<div class="wrap">
+<header>
+  <h1>Any note on the two bass strings</h1>
+  <p class="who">For you if you strum a few open chords and still count up from the headstock to find a note. One objective, about a week of 15-minute sessions.</p>
+  <p class="goal"><strong>Objective.</strong> When the page calls a note (natural, sharp or flat), you play it on the low E or A string, frets 0 to 12, on the next downbeat at 60 bpm: eight calls in a row.</p>
+</header>
+<nav class="map" aria-label="Lesson progress"><ol id="map"></ol></nav>
+<main id="main">
+
+<section id="place" aria-labelledby="h-place">
+  <h2 id="h-place">Placement</h2>
+  <p>Four checks. The second one you answer on the guitar, so have it in your lap.</p>
+  <div id="placeQs"></div>
+  <div id="placeRoute" class="plan" hidden></div>
+</section>
+
+<section id="s1" aria-labelledby="h-s1">
+  <h2 id="h-s1">1. Guess first</h2>
+  <p>The note names run A B C D E F G, then start again at A. One fret raises a note by a half step.</p>
+  <div id="hookQ"></div>
+  <div id="hookAfter" hidden>
+    <p>Listen to the difference. E to F is one fret; F to G is two.</p>
+    <div class="row"><button class="btn quiet" type="button" data-play="40,41">Play E then F</button><button class="btn quiet" type="button" data-play="41,43">Play F then G</button></div>
+    <p>Only two pairs of neighbours are one fret apart: <strong>E to F</strong> and <strong>B to C</strong>. Every other pair is two frets apart. That one rule, plus the open string's name, gives you every note on the string.</p>
+  </div>
+</section>
+
+<section id="s2" aria-labelledby="h-s2">
+  <h2 id="h-s2">2. Walk the low E string</h2>
+  <p>Start at the open string and apply the rule letter by letter. The diagram is drawn like tab: the higher string (A) on top, the nut on the left.</p>
+  <div class="board" id="boardWalk"></div>
+  <table class="walk" id="walkE"><caption class="note" style="text-align:left">Low E, worked out</caption></table>
+  <div class="row"><button class="btn quiet" type="button" id="playWalk">Play the walk</button></div>
+  <p class="note">The dots on your neck at frets 3, 5, 7 and 12 land on <span id="dotsE"></span> here. Those four are worth memorising first; every other natural is one step from one of them.</p>
+</section>
+
+<section id="s3" aria-labelledby="h-s3">
+  <h2 id="h-s3">3. The A string, with less help</h2>
+  <p>Same rule, new starting letter. First fill one gap, then find every copy of a note on both strings.</p>
+  <div class="q"><div class="fade" id="fadeA"></div><div class="row"><button class="btn" type="button" id="fadeCheck">Check</button></div><div class="fb" id="fadeFb" role="status" aria-live="polite"></div></div>
+  <h3 id="findH">Find them on the board</h3>
+  <p id="findPrompt" class="ui"></p>
+  <p class="note">Click or tap a spot; with a keyboard, Tab onto the board, move with the arrow keys and press Enter.</p>
+  <div class="board" id="boardFind"></div>
+  <div class="fb" id="findFb" role="status" aria-live="polite"></div>
+</section>
+
+<section id="s4" aria-labelledby="h-s4">
+  <h2 id="h-s4">4. Sharps and flats</h2>
+  <p>A sharp (#) is one fret above its letter; a flat (b) is one fret below. F# on the low E is F plus one: fret <span data-calc="F#,40"></span>. Bb on the A string is B minus one: fret <span data-calc="Bb,45"></span>.</p>
+  <p>One catch: a flat of the open note. Ab on the A string would be fret minus one, so use the A at fret 12 and come back one: fret <span data-calc="Ab,45"></span>.</p>
+  <div id="sharpQ"></div>
+</section>
+
+<section id="s5" aria-labelledby="h-s5">
+  <h2 id="h-s5">5. On the guitar, against the click</h2>
+  <p>This is the objective, and the page can't hear you, so the check is built from things you can observe. Each bar, the page shows a note. Find it and play it on beat 1 of the next bar. On that same beat the page plays the right note, so you hear at once whether yours matched. For the first few runs, keep a tuner app open as a second opinion.</p>
+  <p><strong>A clean call</strong> means the right note, on the downbeat, without stopping. Pass a rung with eight clean calls in a row. Record one run on your phone and listen back: what you hear while playing hides late notes.</p>
+  <ol class="ladder" id="ladder"></ol>
+  <div class="stage" id="stage" aria-live="polite"><div class="sub" id="stageSub">Press Start for a one-bar count-in.</div><div class="call" id="call"></div><div class="beats" aria-hidden="true"><span></span><span></span><span></span><span></span></div></div>
+  <div class="row"><button class="btn" type="button" id="go">Start</button><button class="btn quiet" type="button" id="stop" disabled>Stop</button></div>
+  <div id="report" hidden>
+    <fieldset class="q"><legend>How many of the eight were clean?</legend>
+      <div class="row"><button class="btn" type="button" data-r="clean">All 8</button><button class="btn quiet" type="button" data-r="almost">6 or 7</button><button class="btn quiet" type="button" data-r="notyet">5 or fewer: not yet</button></div>
+    </fieldset>
+  </div>
+  <div id="plan" class="plan" aria-live="polite"></div>
+</section>
+
+<section id="s6" aria-labelledby="h-s6">
+  <h2 id="h-s6">6. From memory, in two days</h2>
+  <p>Come back after a gap and answer without the diagram. A miss brings the next review forward.</p>
+  <div id="retr"></div>
+  <div class="row"><button class="btn quiet" type="button" id="newRetr">New set</button></div>
+  <div id="due" class="plan" hidden></div>
+  <h3>Tell Claude how it went</h3>
+  <p class="note">This summary is built from what you did on this page, misses included. Copy it into the chat and Claude will plan your next step.</p>
+  <textarea id="summary" readonly aria-label="Progress summary for Claude"></textarea>
+  <div class="row"><button class="btn quiet" type="button" id="copy">Copy summary</button><span class="note" id="copyMsg" role="status"></span></div>
+</section>
+
+<section id="ref" aria-labelledby="h-ref">
+  <h2 id="h-ref">Reference</h2>
+  <details><summary>Every note, frets 0 to 12</summary><div class="board" id="boardAll"></div></details>
+</section>
+</main>
+<footer>Every note name, fret number, diagram and answer here is computed from the tuning data (E2 and A2) in the page's script. The page plays notes; it never listens.</footer>
+</div>
+<script>
+"use strict";
+/* ---------- the one source of truth ---------- */
+const STRINGS=[{name:"A",open:45},{name:"low E",open:40}];      /* MIDI numbers, top row first, like tab */
+const SHARP=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const FLAT=["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"];
+const NAT=["C","D","E","F","G","A","B"];
+const FRETS=12;
+const pc=n=>{const i=SHARP.indexOf(n);return i>=0?i:FLAT.indexOf(n);};
+const nameAt=(midi,flat)=>(flat?FLAT:SHARP)[midi%12];
+const both=midi=>{const s=SHARP[midi%12],f=FLAT[midi%12];return s===f?s:s+"/"+f;};
+const fretOf=(n,open)=>(pc(n)-open%12+12)%12;                   /* lowest fret, 0 to 11 */
+const fretsOf=(n,open)=>{const f=fretOf(n,open);return f===0?[0,12]:[f];};
+const strName=open=>STRINGS.find(s=>s.open===open).name;
+const $=id=>document.getElementById(id);
+function h(t,a={},...k){const e=document.createElement(t);for(const[x,v]of Object.entries(a)){if(x==="html")e.innerHTML=v;else if(x==="text")e.textContent=v;else if(x.startsWith("on"))e[x]=v;else e.setAttribute(x,v);}e.append(...k);return e;}
+
+/* ---------- sound: Karplus-Strong pluck and a click, built only on demand ---------- */
+let AC=null;
+function ac(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();}if(AC.state==="suspended")AC.resume();return AC;}
+function pluck(midi,when){
+  const a=ac();if(!a)return;const t=when||a.currentTime,sr=a.sampleRate,f=440*2**((midi-69)/12),N=Math.round(sr/f),len=Math.floor(sr*1.8);
+  const buf=a.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  for(let i=0;i<N;i++)d[i]=Math.random()*2-1;
+  for(let i=N;i<len;i++)d[i]=.4985*(d[i-N]+d[i-N+1]);
+  const s=a.createBufferSource(),g=a.createGain();s.buffer=buf;g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+1.8);
+  s.connect(g).connect(a.destination);s.start(t);
+}
+function click(when,accent){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.frequency.value=accent?1500:1000;
+  g.gain.setValueAtTime(.25,when);g.gain.exponentialRampToValueAtTime(.001,when+.04);o.connect(g).connect(a.destination);o.start(when);o.stop(when+.05);}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-play]");if(!b)return;const a=ac();if(!a)return;
+  b.dataset.play.split(",").forEach((m,i)=>pluck(+m,a.currentTime+.05+i*.7));});
+
+/* ---------- progress (misses are evidence too) ---------- */
+const KEY="teachme-bassnotes-v1";let S={};
+try{S=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){S={};}
+S.miss=S.miss||{};S.log=S.log||[];S.done=S.done||{};S.rung=S.rung||0;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}paintMap();paintSummary();}
+function missed(note,open){const k=note+" on "+strName(open);S.miss[k]=(S.miss[k]||0)+1;}
+function done(id){S.done[id]=true;save();}
+const PARTS=[["place","Placement"],["s1","1 Guess"],["s2","2 Low E"],["s3","3 A string"],["s4","4 Sharps, flats"],["s5","5 On the guitar"],["s6","6 Review"]];
+function paintMap(){const ol=$("map");ol.innerHTML="";let cur=false;
+  PARTS.forEach(([id,l])=>{const li=h("li",{},h("a",{href:"#"+id,text:l}));if(S.done[id])li.className="done";else if(!cur){cur=true;li.setAttribute("aria-current","step");}ol.append(li);});}
+
+/* ---------- SVG fretboard generated from STRINGS ---------- */
+const W=760,H=150,X0=46,XN=W-14,ROW=[50,104];
+const fx=n=>X0+(XN-X0)*(1-2**(-n/12))/(1-2**(-FRETS/12));        /* real fret spacing */
+const spotX=n=>n===0?X0-24:(fx(n-1)+fx(n))/2;
+function board(el,{labels=null,onPick=null}={}){
+  const NS="http://www.w3.org/2000/svg",svg=document.createElementNS(NS,"svg");
+  const el_=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a){if(/^(fill|stroke|font-family)$/.test(k))e.style.setProperty(k,a[k]);else e.setAttribute(k,a[k]);}return e;};
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.setAttribute("role",onPick?"group":"img");
+  svg.setAttribute("aria-label",onPick?"Fretboard: A string on top, low E below, frets 0 to 12":"Fretboard diagram, A string on top, low E below");
+  svg.append(el_("rect",{x:X0,y:28,width:XN-X0,height:100,fill:"var(--board)",rx:3}));
+  [3,5,7,9].forEach(n=>svg.append(el_("circle",{cx:spotX(n),cy:77,r:5,fill:"var(--pearl)"})));
+  [66,88].forEach(y=>svg.append(el_("circle",{cx:spotX(12),cy:y,r:5,fill:"var(--pearl)"})));
+  for(let n=0;n<=FRETS;n++){svg.append(el_("line",{x1:fx(n),x2:fx(n),y1:28,y2:128,stroke:n?"var(--fret)":"var(--pearl)","stroke-width":n?2.5:7}));
+    const t=el_("text",{x:spotX(n),y:146,"text-anchor":"middle","font-size":12,fill:"var(--muted)","font-family":"var(--ui)"});t.textContent=n;svg.append(t);}
+  STRINGS.forEach((s,i)=>{svg.append(el_("line",{x1:X0-34,x2:XN,y1:ROW[i],y2:ROW[i],stroke:"var(--string)","stroke-width":i?3:2.2}));
+    const t=el_("text",{x:4,y:ROW[i]+4,"font-size":12,fill:"var(--ink)","font-family":"var(--ui)","font-weight":700});t.textContent=s.name==="low E"?"E":"A";svg.append(t);});
+  const spots=[];
+  STRINGS.forEach((s,i)=>{for(let n=0;n<=FRETS;n++){const m=s.open+n,lab=labels?labels(m,s,n):null;
+    const g=el_("g",{class:"spot","data-s":i,"data-f":n});
+    g.append(el_("circle",{class:"ring",cx:spotX(n),cy:ROW[i],r:13,fill:lab?"var(--dot)":"transparent",stroke:lab?"var(--board)":"none","stroke-width":1.5}));
+    if(lab){const t=el_("text",{x:spotX(n),y:ROW[i]+4,"text-anchor":"middle","font-size":lab.length>2?9:11,"font-weight":700,fill:"#241a16","font-family":"var(--ui)"});t.textContent=lab;g.append(t);}
+    if(onPick){g.setAttribute("tabindex",spots.length?"-1":"0");g.setAttribute("role","button");g.setAttribute("aria-label",`${s.name} string, fret ${n}`);
+      g.addEventListener("click",()=>onPick(g,s,n));
+      g.addEventListener("keydown",e=>{const dir={ArrowRight:[0,1],ArrowLeft:[0,-1],ArrowUp:[-1,0],ArrowDown:[1,0]}[e.key];
+        if(e.key==="Enter"||e.key===" "){e.preventDefault();onPick(g,s,n);return;}
+        if(!dir)return;e.preventDefault();const si=Math.min(1,Math.max(0,i+dir[0])),fn=Math.min(FRETS,Math.max(0,n+dir[1]));
+        const nx=svg.querySelector(`.spot[data-s="${si}"][data-f="${fn}"]`);g.setAttribute("tabindex","-1");nx.setAttribute("tabindex","0");nx.focus();});}
+    spots.push(g);svg.append(g);}});
+  el.innerHTML="";el.append(svg);return svg;
+}
+function mark(g,lab,ok){const c=g.querySelector(".ring");c.style.fill=ok?"var(--ok)":"var(--bad)";c.style.stroke="none";
+  const NS="http://www.w3.org/2000/svg",t=document.createElementNS(NS,"text");t.setAttribute("x",c.getAttribute("cx"));t.setAttribute("y",+c.getAttribute("cy")+4);
+  t.setAttribute("text-anchor","middle");t.setAttribute("font-size",lab.length>2?9:11);t.setAttribute("font-weight",700);t.style.fill="var(--bg)";t.style.fontFamily="var(--ui)";t.textContent=lab;g.append(t);}
+
+/* ---------- choice question with explained wrong answers ---------- */
+let uid=0;
+function choice(el,item,after){
+  el.innerHTML="";const name="c"+(++uid),fs=h("fieldset",{class:"q"});fs.append(h("legend",{html:item.q}));if(item.extra)fs.append(h("div",{class:"row",html:item.extra}));
+  item.opts.forEach((o,i)=>{const l=h("label",{class:"opt"});l.append(h("input",{type:"radio",name,value:i}),h("span",{html:o.t}));fs.append(l);});
+  const b=h("button",{class:"btn",type:"button",text:item.reveal?"Lock in my guess":"Check"}),fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
+  fs.append(h("div",{class:"row"},b),fb);el.append(fs);
+  b.onclick=()=>{const sel=fs.querySelector("input:checked");if(!sel){fb.className="fb";fb.textContent="Pick one first; a guess is fine.";return;}
+    const o=item.opts[+sel.value];fb.className="fb "+(o.ok?"ok":"no");fb.innerHTML=`<p class="verdict">${o.ok?"Right.":"Not this one."}</p><p>${o.why}</p>`;
+    if(o.ok||item.reveal){fs.querySelectorAll("input").forEach(x=>x.disabled=true);b.disabled=true;
+      if(!o.ok){const r=item.opts.find(x=>x.ok);fb.append(h("p",{html:`<strong>Answer:</strong> ${r.t}. ${r.why}`}));}if(after)after(o.ok);}
+    else{sel.disabled=true;sel.checked=false;sel.closest(".opt").classList.add("was-wrong");b.textContent="Check again";if(after)after(false,true);}};
+}
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+/* a fret question whose wrong options are computed, and each explains what is really at that fret */
+function fretItem(note,open){
+  const f=fretsOf(note,open)[0],cands=[f+1,f-1,f+2,f-2].filter(x=>x>=0&&x<=FRETS&&x!==f).slice(0,3);
+  const opts=[{t:"fret "+f,ok:true,why:`${note} is fret ${f} on the ${strName(open)} string${f===0?" (and again at 12)":""}.`}]
+    .concat(cands.map(x=>({t:"fret "+x,ok:false,why:`Fret ${x} on the ${strName(open)} string is ${both(open+x)}, ${Math.abs(x-f)===1?"one fret":"two frets"} ${x>f?"above":"below"} ${note}.`})));
+  return {q:`Where is ${note} on the ${strName(open)} string?`,opts:shuffle(opts),note,open};
+}
+
+/* ---------- placement ---------- */
+(function(){
+  const box=$("placeQs"),res={};let n=0;
+  const items=[
+   {k:"names",q:"The two thickest strings, from thickest, are:",opts:[{t:"E then A",ok:true,why:"Low E (thickest), then A."},{t:"A then E",ok:false,why:"The thickest is low E; A is next to it."},{t:"E then B",ok:false,why:"B is the second-thinnest string. After low E comes A."}]},
+   {k:"tune",q:"Play fret 5 on the low E string, then the open A string. Do they match each other and the page's A?",extra:"<button class='btn quiet' type='button' data-play='45'>Play the page's A</button>",opts:[{t:"All three sound the same",ok:true,why:"You're in tune, which this lesson needs: the check in part 5 compares your note with the page's."},{t:"One of them sounds different",ok:false,why:"Tune up first with a tuner app. Every check later depends on your notes matching the page's."},{t:"I can't tell",ok:false,why:"Use a tuner app for now; part 5 suggests keeping it open anyway."}]},
+   {k:"e5",q:"Which note is at fret 5 on the low E string?",opts:shuffle(["A","G","B","Not sure"].map(t=>({t,ok:t===nameAt(45),why:t===nameAt(45)?"Fret 5 of low E is A (the same note as the open A string).":t==="Not sure"?"Parts 1 and 2 show how to work it out.":`${t} is at fret ${fretOf(t,40)}. Fret 5 is A.`})))},
+   {k:"a3",q:"Which fret is C on the A string?",opts:shuffle([3,2,4].map(x=>({t:"fret "+x,ok:x===fretOf("C",45),why:x===fretOf("C",45)?"A, B (fret 2), C (fret 3): B to C is one fret.":`Fret ${x} is ${both(45+x)}. Remember B to C is one fret.`})))}
+  ];
+  items.forEach(it=>{const d=h("div");box.append(d);choice(d,Object.assign({reveal:true},it),ok=>{res[it.k]=ok;if(++n===items.length)route();});});
+  function route(){
+    const R=$("placeRoute");R.hidden=false;
+    if(!res.names)R.innerHTML="Start one step earlier: learn the six open string names (ask Claude for a five-minute drill), then come back to part 1.";
+    else if(!res.tune)R.innerHTML="Tune first. Then start at <a href='#s1'>part 1</a>.";
+    else if(res.e5&&res.a3)R.innerHTML="You can already work naturals out. Skim parts 1 to 3 and start properly at <a href='#s4'>part 4</a>, then go to the guitar in part 5.";
+    else R.innerHTML="Start at <a href='#s1'>part 1</a>.";
+    S.placement=res;done("place");
+  }
+})();
+
+/* ---------- part 1: predict, then hear it ---------- */
+choice($("hookQ"),{reveal:true,q:"The open low E string is E. Where is F?",opts:[
+  {t:"fret 2",ok:false,why:"That's the common guess, because most neighbouring letters are two frets apart. E and F are one of the two exceptions."},
+  {t:"fret 1",ok:true,why:"E to F is a half step, one fret. Fret 2 is F#."},
+  {t:"fret 3",ok:false,why:`Fret 3 is ${nameAt(43)}. F comes before that.`}]},()=>{$("hookAfter").hidden=false;done("s1");});
+
+/* ---------- part 2: worked walk, computed ---------- */
+(function(){
+  const open=40,start=NAT.indexOf("E"),t=$("walkE");
+  t.append(h("tr",{},h("th",{scope:"col",text:"Note"}),h("th",{scope:"col",text:"Step from the last"}),h("th",{scope:"col",text:"Fret"})));
+  for(let i=0;i<=7;i++){const n=NAT[(start+i)%7],prev=NAT[(start+i+6)%7],f=i===7?12:fretOf(n,open),step=i===0?"open string":(f-(i===1?0:fretOf(prev,open)))===1?`${prev} to ${n}: one fret`:`${prev} to ${n}: two frets`;
+    t.append(h("tr",{},h("td",{text:n}),h("td",{text:step}),h("td",{class:"n",text:String(f)})));}
+  const nat=new Set(NAT.map(pc));
+  board($("boardWalk"),{labels:(m,s)=>s.open===open&&nat.has(m%12)?nameAt(m):null});
+  $("dotsE").textContent=[3,5,7,12].map(f=>`${both(open+f)} (${f})`).join(", ");
+  $("playWalk").onclick=()=>{const a=ac();if(!a)return;[0,1,3,5,7,8,10,12].forEach((f,i)=>pluck(open+f,a.currentTime+.05+i*.45));done("s2");};
+})();
+
+/* ---------- part 3: faded A string, then find on the board ---------- */
+(function(){
+  const open=45,start=NAT.indexOf("A"),box=$("fadeA"),blanks=["D","F","G"],inputs={};
+  for(let i=0;i<=7;i++){const n=NAT[(start+i)%7],f=i===7?12:fretOf(n,open);
+    if(blanks.includes(n)&&i<7){const inp=h("input",{type:"number",class:"fret",id:"fa"+n,min:"0",max:"12",inputmode:"numeric"});inputs[n]=[inp,f];box.append(h("label",{for:"fa"+n},n,inp));}
+    else box.append(h("span",{class:"lbl"},n,h("span",{class:"given",text:String(f)})));}
+  $("fadeCheck").onclick=()=>{const wrong=Object.entries(inputs).filter(([n,[inp,f]])=>+inp.value!==f||inp.value==="");
+    const fb=$("fadeFb");fb.className="fb "+(wrong.length?"no":"ok");
+    fb.innerHTML=wrong.length?`<p class="verdict">Not yet.</p>`+wrong.map(([n,[inp,f]])=>`<p>${n}: ${inp.value===""?"empty":`fret ${inp.value} is ${both(open+(+inp.value))}`}. Step from the letter before: ${NAT[(NAT.indexOf(n)+6)%7]} to ${n} is ${["C","F"].includes(n)?"one fret":"two frets"}.</p>`).join("")
+      :`<p class="verdict">Right.</p><p>Notice D at fret 5: the same fret as A on the low E. That pattern (same fret, one string up, five letters higher) comes back later.</p>`;
+    if(!wrong.length)startFind();};
+  let target,found;
+  function startFind(){
+    const pool=NAT.filter(n=>n!==S.lastFind);target=pool[Math.floor(Math.random()*pool.length)];S.lastFind=target;found=new Set();
+    const need=STRINGS.flatMap(s=>fretsOf(target,s.open).map(f=>s.open+":"+f));
+    $("findPrompt").innerHTML=`Click every <strong>${target}</strong> on both strings (${need.length} spots, frets 0 to 12).`;$("findFb").innerHTML="";
+    board($("boardFind"),{onPick:(g,s,n)=>{if(g.dataset.done)return;const ok=need.includes(s.open+":"+n);g.dataset.done=1;mark(g,both(s.open+n),ok);pluck(s.open+n);
+      const fb=$("findFb");if(ok){found.add(s.open+":"+n);fb.className="fb ok";fb.innerHTML=`<p>${target}: ${s.name} string, fret ${n}. ${need.length-found.size} to go.</p>`;}
+      else{missed(target,s.open);fb.className="fb no";const d=fretsOf(target,s.open).map(f=>f-n).sort((a,b)=>Math.abs(a)-Math.abs(b))[0];
+        fb.innerHTML=`<p class="verdict">That's ${both(s.open+n)}.</p><p>${target} on the ${s.name} string is ${Math.abs(d)} fret${Math.abs(d)>1?"s":""} ${d>0?"higher":"lower"}.</p>`;}
+      if(found.size===need.length){fb.className="fb ok";fb.innerHTML=`<p class="verdict">All ${need.length} found.</p>`;fb.append(h("button",{class:"btn quiet",type:"button",text:"Another note",onclick:startFind}));
+        S.findRounds=(S.findRounds||0)+1;if(S.findRounds>=2)done("s3");else save();}}});
+  }
+})();
+
+/* ---------- part 4: sharps and flats, endless variants, need 4 in a row ---------- */
+document.querySelectorAll("[data-calc]").forEach(e=>{const[n,o]=e.dataset.calc.split(",");e.textContent=fretOf(n,+o);});
+let streak=0;
+function sharpRound(){
+  const acc=Math.random()<.5?"#":"b",pool=NAT.filter(n=>!(acc==="#"&&["E","B"].includes(n))&&!(acc==="b"&&["F","C"].includes(n)));
+  const note=pool[Math.floor(Math.random()*pool.length)]+acc,open=STRINGS[Math.floor(Math.random()*2)].open,f=fretOf(note,open),base=fretOf(note[0],open);
+  const box=$("sharpQ");box.innerHTML="";const fs=h("fieldset",{class:"q"});fs.append(h("legend",{text:`Which fret is ${note} on the ${strName(open)} string?`}));
+  const inp=h("input",{type:"number",class:"fret",id:"sf",min:"0",max:"12",inputmode:"numeric","aria-label":"fret number"}),b=h("button",{class:"btn",type:"button",text:"Check"}),fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
+  fs.append(h("div",{class:"row"},inp,b,h("span",{class:"note",text:`${streak} of 4 in a row`})),fb);box.append(fs);
+  b.onclick=()=>{if(inp.value===""){fb.textContent="Type a fret number.";return;}
+    const ok=+inp.value===f;if(!ok)missed(note,open);streak=ok?streak+1:0;
+    const how=acc==="#"?`${note[0]} is fret ${base}, so ${note} is fret ${f}.`:base===0?`${note[0]} is the open string, so use ${note[0]} at fret 12 and come back one: fret ${f}.`:`${note[0]} is fret ${base}, so ${note} is fret ${f}.`;
+    fb.className="fb "+(ok?"ok":"no");fb.innerHTML=`<p class="verdict">${ok?"Right.":`Fret ${inp.value} is ${both(open+(+inp.value))}.`}</p><p>${how}</p>`;b.disabled=true;
+    if(streak>=4){fb.append(h("p",{text:"Four in a row. On to the guitar."}));done("s4");}
+    else{fb.append(h("button",{class:"btn quiet",type:"button",text:"Next note",onclick:sharpRound}));save();}};
+}
+sharpRound();
+
+/* ---------- part 5: tempo ladder with an honest "not yet" ---------- */
+const ALLN=[...NAT,"C#","Eb","F#","Ab","Bb","Db","G#"];
+const RUNGS=[
+  {bpm:40,notes:NAT,strings:[40],label:"Naturals, low E only"},
+  {bpm:50,notes:NAT,strings:[40,45],label:"Naturals, both strings"},
+  {bpm:50,notes:ALLN,strings:[40,45],label:"All notes, both strings"},
+  {bpm:60,notes:ALLN,strings:[40,45],label:"All notes, both strings (the objective)"}];
+function paintLadder(){const ol=$("ladder");ol.innerHTML="";
+  RUNGS.forEach((r,i)=>{const tries=S.log.filter(x=>x.rung===i),clean=tries.filter(x=>x.r==="clean").length;
+    const st=S.rung>i?"passed":i===S.rung?(tries.length?`${tries.length} run${tries.length>1?"s":""}, ${tries.length-clean} not clean`:"current"):"locked";
+    ol.append(h("li",{class:i===S.rung?"cur":""},h("span",{class:"k",text:r.bpm+" bpm"}),h("span",{text:r.label}),h("span",{class:"s",text:st})));});}
+let timer=null,run=null;
+function startRun(){
+  const a=ac();if(!a){$("stageSub").textContent="This browser has no Web Audio, so the click can't run here. Use a metronome app with the same rungs.";return;}
+  const r=RUNGS[Math.min(S.rung,RUNGS.length-1)],spb=60/r.bpm;let last=null;
+  const calls=[];for(let i=0;i<8;i++){let c;do{c={n:r.notes[Math.floor(Math.random()*r.notes.length)],o:r.strings[Math.floor(Math.random()*r.strings.length)]};}while(last&&c.n===last.n&&c.o===last.o);calls.push(last=c);}
+  run={t0:a.currentTime+.15,beat:0,calls,spb};const total=4*(calls.length+2);
+  $("go").disabled=true;$("stop").disabled=false;$("report").hidden=true;
+  timer=setInterval(()=>{
+    while(run&&run.t0+run.beat*spb<a.currentTime+.12){const b=run.beat,t=run.t0+b*spb,bar=Math.floor(b/4),beat=b%4;
+      if(b>=total-3){finishRun();return;}
+      click(t,beat===0);
+      if(beat===0&&bar>=2)pluck(calls[bar-2].o+fretsOf(calls[bar-2].n,calls[bar-2].o)[0],t);
+      setTimeout(()=>{if(!run)return;document.querySelectorAll(".beats span").forEach((s,i)=>s.classList.toggle("on",i===beat));
+        if(beat===0){const c=calls[bar-1];$("call").textContent=bar===0?"":c?`${c.n}  on ${strName(c.o)}`:"";
+          $("stageSub").textContent=bar===0?"Count-in":c?`Call ${bar} of 8: play it on the next beat 1`:"Last one: listen";}},Math.max(0,(t-a.currentTime)*1000));
+      run.beat++;}
+  },25);
+}
+function stopRun(){clearInterval(timer);timer=null;run=null;$("go").disabled=false;$("stop").disabled=true;document.querySelectorAll(".beats span").forEach(s=>s.classList.remove("on"));}
+function finishRun(){stopRun();$("call").textContent="";$("stageSub").textContent="Run finished. Be strict: a late note isn't clean.";$("report").hidden=false;$("report").querySelector("button").focus();}
+$("go").onclick=startRun;$("stop").onclick=()=>{stopRun();$("stageSub").textContent="Stopped. A stopped run doesn't count either way.";};
+document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{
+  const r=b.dataset.r,i=Math.min(S.rung,RUNGS.length-1);S.log.push({rung:i,r,at:Date.now()});$("report").hidden=true;
+  const recent=S.log.filter(x=>x.rung===i).slice(-2),P=$("plan");
+  if(r==="clean"){if(S.rung<RUNGS.length-1){S.rung++;P.innerHTML=`Rung passed. Next: ${RUNGS[S.rung].label} at ${RUNGS[S.rung].bpm} bpm. Start it in your next session, not right now; the gap helps it stick.`;}
+    else{P.innerHTML="That's the objective. Do one more clean run on a different day before you call it learned, then tell Claude (part 6).";done("s5");}}
+  else if(r==="almost")P.innerHTML="Same rung again. Before the next run, say the missed notes' frets out loud twice without the guitar.";
+  else if(recent.length===2&&recent.every(x=>x.r==="notyet")){
+    if(S.rung>0){S.rung--;P.innerHTML=`Two "not yet" runs in a row, so the plan changes: back to ${RUNGS[S.rung].label} at ${RUNGS[S.rung].bpm} bpm. That's the normal shape of practice, not a reset.`;}
+    else P.innerHTML="Two in a row at the slowest rung. Drop the click for a session: say each natural and play it on the low E (E, F, G, A, B, C, D, E), five slow passes. Then copy the summary in part 6 to Claude and say which notes you hesitate on.";}
+  else P.innerHTML="Not yet. Stay on this rung. If the next run is also not yet, the plan will step down.";
+  save();paintLadder();});
+
+/* ---------- part 6: spaced retrieval and the report for Claude ---------- */
+function retrieval(){
+  const box=$("retr");box.innerHTML="";let n=0,miss=0;
+  const picks=shuffle(STRINGS.flatMap(s=>ALLN.map(x=>[x,s.open]))).slice(0,3);
+  const items=picks.map(([x,o])=>fretItem(x,o));
+  items.push({q:"Which two neighbouring letters are only one fret apart?",opts:shuffle([{t:"E-F and B-C",ok:true,why:"Those two pairs are half steps; all other neighbours are two frets."},{t:"A-B and D-E",ok:false,why:"Both are two frets apart. The one-fret pairs are E-F and B-C."},{t:"None: every letter is two frets",ok:false,why:"That's the part 1 trap. E-F and B-C are one fret."}])});
+  items.forEach((it,i)=>{const d=h("div");box.append(d);choice(d,Object.assign({reveal:true},it,{q:(i+1)+". "+it.q}),ok=>{if(!ok&&it.note)missed(it.note,it.open);if(!ok)miss++;if(++n===items.length)schedule(miss);});});
+}
+function schedule(miss){const gap=miss?1:Math.min((S.gap||1)*2,30);S.gap=gap;S.due=Date.now()+gap*864e5;S.reviews=(S.reviews||0)+1;
+  const D=$("due");D.hidden=false;D.textContent=`${4-miss} of 4. Next review in ${gap} day${gap>1?"s":""}: ${new Date(S.due).toLocaleDateString()}. Nothing will remind you, so add it to your calendar.`;
+  if(S.reviews>=2&&!miss)done("s6");else save();}
+$("newRetr").onclick=retrieval;retrieval();
+function paintSummary(){
+  const worst=Object.entries(S.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v})`).join(", ")||"none yet";
+  const runs=S.log.map(x=>`${RUNGS[x.rung].bpm} bpm ${RUNGS[x.rung].label.split(" (")[0]}: ${x.r==="notyet"?"not yet":x.r}`).slice(-6).join("; ")||"no runs yet";
+  $("summary").value=`Bass-string notes lesson, progress so far.\nPlacement: ${S.placement?Object.entries(S.placement).map(([k,v])=>k+" "+(v?"right":"missed")).join(", "):"not done"}.\nParts done: ${PARTS.filter(p=>S.done[p[0]]).map(p=>p[1]).join(", ")||"none"}.\nCurrent rung: ${RUNGS[Math.min(S.rung,3)].label} at ${RUNGS[Math.min(S.rung,3)].bpm} bpm.\nRecent runs: ${runs}.\nNotes I missed most (count): ${worst}.\nWhat I noticed: `;}
+$("copy").onclick=async()=>{const t=$("summary");try{await navigator.clipboard.writeText(t.value);$("copyMsg").textContent="Copied. Add what you noticed, then paste it in the chat.";}catch(e){t.select();$("copyMsg").textContent="Selected: press Ctrl or Cmd+C.";}};
+
+/* ---------- reference, theme, first paint ---------- */
+board($("boardAll"),{labels:m=>nameAt(m)});
+(function(){const b=$("theme");let t=null;try{t=localStorage.getItem("teachme-theme");}catch(e){}
+  const apply=v=>{if(v)document.documentElement.dataset.theme=v;const dark=v?v==="dark":matchMedia("(prefers-color-scheme: dark)").matches;b.textContent=dark?"Light theme":"Dark theme";};
+  apply(t);b.onclick=()=>{const v=b.textContent==="Light theme"?"light":"dark";try{localStorage.setItem("teachme-theme",v);}catch(e){}apply(v);};})();
+paintMap();paintLadder();paintSummary();
+</script>
+</body>
+</html>
