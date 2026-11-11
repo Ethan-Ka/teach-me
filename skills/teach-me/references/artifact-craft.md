@@ -275,51 +275,63 @@ choice($("#hook"), {
 });
 ```
 
-**Variant retry, ending on mastery.** For practice, wrap the same component in a generator so a miss produces a fresh item. The part ends when a mastery criterion is met (here, `need` right in a row, counting only items flagged as discriminating), not after a set number of items, and an "I've got this, test me" button offers one hard item that finishes the part if it's right:
+**Variant retry, ending on mastery.** For practice, wrap the same component in a generator so a miss produces a fresh item. The part ends on a mastery criterion, not after a set number of items: here, `need` right in a row, where the streak also has to have exposed every misconception the part targets. A random streak can miss one; in iteration 2, three random items left both of a lesson's key misconceptions untouched 36% of the time. So the generator takes a target and the next draw aims at whatever the streak hasn't met. "I've got this, test me" draws two or three fresh items that together cover every misconception and all have to be right, because a single fixed item can be remembered or guessed:
 
 ```js
-// make() returns a fresh { q, opts, counts } from data; counts is false for a
-// deliberately non-discriminating item (section 5.8), which never advances the streak.
-// challenge() returns one hard item that discriminates every named misconception.
-function practice(el, { id, make, need = 3, challenge }) {
-  let streak = 0;
+// make(target) returns a fresh { q, opts, exposes } from data. exposes lists the
+// misconceptions this item separates (section 5.8); [] marks a deliberately
+// non-discriminating item, which never advances the streak. target, when given,
+// asks for an item that exposes that misconception.
+function practice(el, { id, make, targets, need = 3, testN = 3 }) {
+  let streak = 0, seen = new Set();          // misconceptions exposed inside this streak
+  const reset = () => { streak = 0; seen = new Set(); };
   const finish = msg => { markDone(id); el.replaceChildren(h("p", { text: msg })); };
-  const next = (maker = make, isTest = false) => {
-    const holder = h("div"), item = maker();
-    el.replaceChildren(holder);
-    choice(holder, { ...item, id, reveal: true }, ok => {
-      if (isTest && ok) return finish("Challenge passed. This part is done.");
-      if (isTest || !ok) streak = 0;
-      else if (item.counts !== false) streak++;
-      if (streak >= need) return finish(`${need} in a row. This part is done.`);
-      el.append(h("p", { class: "note", text: isTest ? "Not this time, so back to practice." : `${streak} of ${need} in a row.` }),
-        h("button", { type: "button", class: "btn", text: ok ? "Next one" : "Try a fresh one", onclick: () => next() }));
+  const btn = (text, onclick, cls = "btn") => h("button", { type: "button", class: cls, text, onclick });
+  const ask = (item, then) => { const holder = h("div"); el.replaceChildren(holder); choice(holder, { ...item, id, reveal: true }, then); };
+  // Aim the next draw at a misconception the streak hasn't met, so "N in a row"
+  // can't be reached on items the wrong model also gets right.
+  const drill = () => {
+    const item = make(targets.find(t => !seen.has(t)));
+    ask(item, ok => {
+      if (!ok) reset();
+      else if (item.exposes.length) { streak++; item.exposes.forEach(m => seen.add(m)); }
+      const left = targets.filter(t => !seen.has(t)).length;
+      if (streak >= need && !left) return finish(`${streak} in a row, covering every mistake this part fixes. This part is done.`);
+      el.append(h("p", { class: "note", text: !ok ? "Streak reset." : streak >= need ? "One more, on a case you haven't met yet." : `${streak} of ${need} in a row.` }),
+        btn(ok ? "Next one" : "Try a fresh one", drill));
     });
-    if (challenge && !isTest)
-      el.append(h("button", { type: "button", class: "btn quiet", text: "I've got this, test me", onclick: () => next(challenge, true) }));
+    el.append(btn("I've got this, test me", test, "btn quiet"));
   };
-  next();
+  // testN fresh random items that together expose every target; all must be right.
+  const test = () => {
+    const order = shuffle([...targets]);
+    const items = Array.from({ length: Math.max(testN, targets.length) }, (_, i) => make(order[i % order.length], true));
+    let i = 0;
+    const one = () => ask(items[i], ok => {
+      if (!ok) { reset(); return el.append(h("p", { class: "note", text: "Not this time, so back to practice." }), btn("Back to practice", drill)); }
+      if (++i === items.length) return finish(`${i} of ${i} on fresh items. This part is done.`);
+      el.append(h("p", { class: "note", text: `${i} of ${items.length}.` }), btn("Next", one));
+    });
+    one();
+  };
+  drill();
 }
 
+// Binary search worst case. Two misconceptions: "it's log2(n)" (wrong only when n is a
+// power of two) and "it checks half the list" (n / 2).
+const RIGHT = n => Math.ceil(Math.log2(n + 1));
+const WRONG = { log2: n => Math.ceil(Math.log2(n)), half: n => Math.ceil(n / 2) };
+const WHY = { log2: "is log2 of the count, but that many guesses cover one item fewer", half: "is half the list: that's one halving, not a halving every guess" };
 practice($("#halving"), {
-  id: "halving", need: 3,
-  // 1,024 items: "log2 of 1,024 is 10" is the misconception, but 10 guesses cover only 1,023.
-  challenge: () => ({ q: "Worst case for binary search over 1,024 sorted items?", opts: [
-    { t: "11", ok: true, why: "10 guesses cover 2 to the 10th minus 1 = 1,023 items. One more item needs an 11th guess." },
-    { t: "10", ok: false, why: "That's log2(1,024). But 10 guesses cover only 1,023 items, one short." },
-    { t: "9", ok: false, why: "9 guesses cover only 511 items." },
-  ] }),
-  make() {
-    const n = [50, 120, 700, 3000, 64000][Math.floor(Math.random() * 5)];
-    const k = Math.ceil(Math.log2(n + 1));
-    return {
-      q: `Worst case for binary search over ${n.toLocaleString()} sorted items?`,
-      opts: shuffle([
-        { t: String(k), ok: true, why: `2 to the ${k} is ${2 ** k}, the first power of two above ${n}.` },
-        { t: String(k + 1), ok: false, why: `${k} guesses already cover up to ${2 ** k - 1} items, which includes ${n}.` },
-        { t: String(k - 1), ok: false, why: `${k - 1} halvings cover only ${2 ** (k - 1) - 1} items.` },
-      ]),
-    };
+  id: "halving", need: 3, targets: Object.keys(WRONG),
+  make(target, hard = false) {
+    const pool = target === "log2" ? [64, 128, 1024, 4096] : hard ? [3000, 64000, 500000] : [50, 120, 700, 3000];
+    const n = pick(pool), k = RIGHT(n), seen = new Set([k]);
+    const opts = [{ t: String(k), ok: true, why: `${k} guesses cover up to 2 to the ${k} minus 1 = ${2 ** k - 1} items, the first count to reach ${n.toLocaleString()}.` }];
+    for (const m in WRONG) { const v = WRONG[m](n); if (!seen.has(v)) { seen.add(v); opts.push({ t: String(v), ok: false, why: `${v} ${WHY[m]}.` }); } }
+    if (!seen.has(k - 1)) opts.push({ t: String(k - 1), ok: false, why: `${k - 1} guesses cover only ${2 ** (k - 1) - 1} items.` });
+    return { q: `Worst case for binary search over ${n.toLocaleString()} sorted items?`, opts: shuffle(opts),
+             exposes: Object.keys(WRONG).filter(m => WRONG[m](n) !== k) };
   },
 });
 ```
@@ -555,6 +567,8 @@ In a multi-session course, show the due count in the progress map ("3 due today"
 
 **States.** Idle: the count, the time per item, and a Start button. Running: one prompt at a time, the elapsed time not shown as a countdown (a ticking clock adds pressure without information). Wrong: recorded with what was typed. Slow: right but over the limit, reported separately from wrong. Finished: right-and-in-time, right-but-slow, and wrong, the missed items listed, the best score stored.
 
+**Also use it to block a slower shortcut.** If the objective says "without working it out" and the workaround is counting (up from fret 0, through the times table), an untimed drill measures the counting. Time it and keep right-but-slow out of the mastery count. In iteration 2 an untimed root drill could be passed by counting up from the nut, which was exactly what its objective ruled out.
+
 **Accessibility.** WCAG 2.2.1 requires that time limits be adjustable, so the learner sets the seconds per item, and nothing auto-advances: the time is measured, never enforced.
 
 ```js
@@ -646,7 +660,7 @@ function pickItem(gen, right, wrong, { weakShare = 0.15, tries = 1000 } = {}) {
   for (let i = 0; i < tries; i++) {
     const item = gen(), answer = right(item);
     const blind = Object.keys(wrong).filter(k => wrong[k](item) === answer);
-    if (!blind.length || allowWeak) return { item, answer, blind, counts: !blind.length };
+    if (!blind.length || allowWeak) return { item, answer, blind, exposes: Object.keys(wrong).filter(k => !blind.includes(k)) };
   }
   throw new Error(`No discriminating item in ${tries} draws. Widen the generator.`);
 }
@@ -662,14 +676,14 @@ console.log("filtered", discriminationRate(() => pickItem(genExpr, RIGHT, WRONG,
 
 // Multiple choice: the wrong options are the misconception answers, each with its explanation.
 function exprItem() {
-  const { item, answer, counts } = pickItem(genExpr, RIGHT, WRONG);
+  const { item, answer, exposes } = pickItem(genExpr, RIGHT, WRONG);
   const { a, b, c } = item, seen = new Set([answer]);
   const opts = [{ t: String(answer), ok: true, why: `${b} times ${c} is ${b * c}, then add ${a}.` }];
   for (const k in WRONG) {
     const v = WRONG[k](item);
     if (!seen.has(v)) { seen.add(v); opts.push({ t: String(v), ok: false, why: `${v} ${WHY[k]}` }); }
   }
-  return { q: `What is ${a} + ${b} × ${c}?`, opts, counts };
+  return { q: `What is ${a} + ${b} × ${c}?`, opts, exposes };
 }
 
 // Typed answers: name the misconception the answer matches, if any.
@@ -683,7 +697,36 @@ function diagnoseTyped(item, typed) {
 
 On a raw draw here, `leftToRight` is caught about 80% of the time (it agrees whenever `a` is 0 or `c` is 1) and `addAll` about 98% (it agrees only when `b` and `c` are both 0 or both 2); filtered, both are 100%. If filtering rejects most draws, the generator is aimed at the wrong region: change it to build discriminating items directly (for a "whole stack versus run" misconception, always place a lone stone beside a run), then filter what's left.
 
-**Mastery and the streak.** `practice()` in 5.1 counts only items with `counts !== false`. The challenge item should separate every misconception at once.
+**Mastery and the streak.** `practice()` in 5.1 counts only items whose `exposes` list is not empty, and finishes only when the streak's items have exposed every target. Return `exposes` from the generator (the misconceptions whose answer differs on this item) instead of a yes-or-no flag, so the streak can tell which ones it has met.
+
+**Coverage on every path, checked at load.** Discriminating items help only on the path the learner takes. In iteration 2 the corrective items sat in parts that placement let the misconception holder skip, through gate items those misconceptions answered correctly. So the page asserts two things. For every route placement allows, including the shortest, the items a learner is guaranteed to answer expose each misconception at least twice. And each gate fails under every misconception that the parts it skips repair. Generated items count through their pool: if a check already asserts that every item in a pool separates a misconception, one representative stands for the draw.
+
+```js
+// Continues the order-of-operations sketch above (RIGHT, WRONG).
+const exposes = item => Object.keys(WRONG).filter(k => WRONG[k](item) !== RIGHT(item));
+const PARTS = {                       // items each part guarantees the learner answers
+  place:      [{ a: 2, b: 3, c: 4 }, { a: 1, b: 5, c: 2 }],
+  precedence: [{ a: 3, b: 2, c: 5 }, { a: 4, b: 6, c: 3 }],
+  signs:      [{ a: 2, b: 7, c: 3 }],
+  closing:    [{ a: 5, b: 4, c: 6 }, { a: 1, b: 9, c: 2 }],
+};
+const REPAIRS = { precedence: ["leftToRight"], signs: ["addAll"] };   // what each part fixes
+const GATES = [{ needs: [PARTS.place[0]], skips: ["precedence"] },   // all `needs` right => skip
+               { needs: PARTS.place, skips: ["precedence", "signs"] }];
+const ROUTES = [[], ...GATES.map(g => g.skips)];                      // full path, then each shortcut
+const pathItems = skip => Object.keys(PARTS).filter(p => !skip.includes(p)).flatMap(p => PARTS[p]);
+
+checks.push(
+  ...ROUTES.map(skip => [`route skipping [${skip}] exposes each misconception twice`, () =>
+    Object.keys(WRONG).every(k => pathItems(skip).filter(it => exposes(it).includes(k)).length >= 2)]),
+  ...GATES.map(g => [`gate to skip [${g.skips}] fails under every misconception those parts repair`, () =>
+    g.skips.flatMap(p => REPAIRS[p]).every(k => g.needs.some(it => exposes(it).includes(k)))]),
+);
+// A boundary gate shows the failure: { a: 0, b: 2, c: 2 } gives 4 under the right rule
+// and under both misconceptions, so it would let every misconception holder skip.
+```
+
+Keep `ROUTES` derived from the same table the routing code reads, so the check can't drift from what the page actually does. The same goes for the closing set: assert that it exposes each misconception at least once.
 
 **Also run it on fixed items.** For the hook, each placement item and the final check, add one line per item to the page's `checks` array asserting that the right answer differs from each misconception's (section 10).
 
@@ -856,6 +899,10 @@ What goes in it:
 - **Every hand-written sentence that names a value about computed content.** Where a sequence starts or ends, which beat plays which note, a count, a total, which option is longest, which rows survive.
 - **Goal constants read in more than one place:** the objective's tempo against the top rung, the streak length in the text against the code's.
 - **Each fixed item's discrimination:** the hook, the placement items, the challenge item (section 5.8).
+- **Coverage and gates:** every route exposes each misconception twice, and each gate fails under the misconceptions it lets a learner skip (section 5.8).
+- **Reasons in feedback strings.** A wrong-answer explanation is a factual claim. In iteration 2 every computed note was right and the lesson failed on a reason in the feedback ("box 1 to box 3 skips box 2"; nothing lies between them). Generate the reason from the engine, or assert it.
+- **Promises about the page itself:** "every key here is new" (assert the retrieval keys and the drill keys don't overlap), "covers all twelve", "one per string".
+- **Spelling in the domain's convention.** Assert that names render the way the field writes them: in a flat key every note name is spelled with flats (`spell("Bb minor")` contains no "#"). A sharp-only table gave A# for Bb minor's root.
 - **Each fixed multiple-choice item's lint** (`mcLint`, section 5.1).
 
 ```js
@@ -930,7 +977,10 @@ If no browser is available, say so in the hand-over, and say which checks were d
 - [ ] Wrong feedback says what the learner's answer actually means; right feedback says why.
 - [ ] Variants after misses; misses recorded with what was answered.
 - [ ] Generators filtered to discriminating items, rate measured; non-discriminating items flagged and never counted toward mastery.
-- [ ] Practice ends on a mastery criterion, with an "I've got this, test me" challenge.
+- [ ] Practice ends on a mastery criterion whose streak has exposed every targeted misconception; "test me" is two or three random items covering them all.
+- [ ] `checks` asserts that every route, including the shortest, exposes each misconception twice, that each gate fails under the misconceptions it skips, and that the closing set covers all of them.
+- [ ] Placement items appear one at a time; no item's options or feedback reveal another's answer.
+- [ ] Recall drills timed where the shortcut is counting; right-but-slow kept out of mastery.
 - [ ] Multiple choice: options similar in length and grammar, wrong options from named misconceptions, order shuffled, `mcLint` clean.
 - [ ] Keyboard: native controls, roving tabindex for diagrams, buttons as the primary move controls for ordering; visible focus everywhere.
 - [ ] Feedback regions are `aria-live="polite"`; time limits adjustable and never enforced by auto-advance.
@@ -942,7 +992,7 @@ If no browser is available, say so in the hand-over, and say which checks were d
 
 **Verified**
 - [ ] A `checks` array asserts every stated fact the code could contradict and every fixed item's discrimination; it passes at load.
-- [ ] Every sentence naming a value traced to the code or check that guarantees it.
+- [ ] Every sentence naming a value traced to the code or check that guarantees it, including feedback reasons and promises about the page; names spelled in the domain's convention.
 - [ ] Opened in a headless browser: no console errors, layout checked at three widths in both themes, core task played through at 390 px, every interaction played through, generated text read.
 - [ ] no-slop audit script run with zero failures; judgment checklist walked.
 
@@ -957,5 +1007,6 @@ Sources and findings behind this file:
 - no-slop-design skill: SKILL.md four decisions; references/visual.md (palette, type, layout, decoration), copy.md (no em dashes, banned vocabulary, explanatory filler), craft.md (states, accessibility baseline, responsive widths), audit-checklist.md.
 - WCAG 2.2 AA: 1.4.3 and 1.4.11 contrast, 2.1.1 keyboard, 2.2.1 timing adjustable, 1.4.2 audio control.
 - testing/reports/iter-1*.md: fact checks at load and tracing the prose (fretboard G2 errors), discriminating generators (Driftstones generator rate, hook collision), mastery exit (learner quit at level 4), option hygiene (longest option correct), phone-width core task (min-width boards), left-border and legend overflow (audit warnings, grader screenshots). Practitioner.
+- testing/reports/iter-2*.md: coverage-aware streak and multi-item test, path coverage and gate checks (Brindle placement routed around M3 and M4), feedback reasons, page promises and spelling (fretboard G2), timed recall (the root drill). Practitioner, one run per condition.
 - Practitioner or v0: the visual adaptations, the five-state model, the code sketches (tested by extraction into a headless-browser test page), the honor-system ladder mechanics.
 -->

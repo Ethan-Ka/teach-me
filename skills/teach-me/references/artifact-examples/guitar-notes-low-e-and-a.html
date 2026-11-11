@@ -171,7 +171,7 @@ footer{margin-top:4rem;color:var(--muted);font-size:.9rem}
 
 <section id="s6" aria-labelledby="h-s6">
   <h2 id="h-s6" tabindex="-1">6. From memory, in two days</h2>
-  <p>Come back after a gap and answer without the diagram. You type every answer, and the questions run the other way too: some give a fret and ask for the note. A miss brings the next review forward.</p>
+  <p>Come back after a gap and answer without the diagram. You type every answer, and the questions run the other way too: some give a fret and ask for the note. A miss brings the next review forward, and so does a right answer that takes longer than one bar at the goal tempo (<span data-k="recallS"></span> seconds), because on the guitar you'd be late.</p>
   <div class="row"><button class="btn" type="button" id="startRetr">Start from memory</button></div>
   <p class="note" id="retrGate" hidden></p>
   <div id="retr"></div>
@@ -362,15 +362,22 @@ const PLACE=[
 ];
 (function(){
   const box=$("placeQs"),res={};let n=0;
-  PLACE.forEach(it=>{const d=h("div");box.append(d);choice(d,Object.assign({reveal:true},it),ok=>{res[it.k]=ok;if(++n===PLACE.length)route(res);});});
+  /* one item at a time, so no item's options or feedback can give away a later one */
+  const ask=()=>{const it=PLACE[n],d=h("div");box.append(d);choice(d,Object.assign({reveal:true},it),ok=>{res[it.k]=ok;if(++n===PLACE.length)route(res);else ask();});};
+  ask();
   if(S.placement)applySkips();
 })();
+/* routes: every item in needs right => those parts collapse. The checks read this same table. */
+const ROUTES=[{needs:["e8","a3","bb"],skip:["s1","s2","s3","s4"],start:"s5",msg:"You already place naturals, sharps and flats on both strings, so parts 1 to 4 are collapsed. Start at part 5, on the guitar."},
+  {needs:["e8","a3"],skip:["s1","s2","s3"],start:"s4",msg:"You already work out naturals on both strings, so parts 1 to 3 are collapsed. Start at part 4, sharps and flats."}];
+/* what each skippable part repairs: a gate may skip it only if each of these gets the gate wrong */
+const REPAIRS={s1:["allTwo","onePerLetter"],s2:["allTwo","onePerLetter"],s3:["allTwo","onePerLetter"],s4:["flipped"]};
 function route(res){
   const R=$("placeRoute");R.hidden=false;let skip=[],start="s1",msg;
   if(!res.names)msg="Start one step earlier: learn the six open string names (ask Claude for a five-minute drill), then come back to part 1.";
   else{
-    if(res.e8&&res.a3&&res.bb){skip=["s1","s2","s3","s4"];start="s5";msg="You already place naturals, sharps and flats on both strings, so parts 1 to 4 are collapsed. Start at part 5, on the guitar.";}
-    else if(res.e8&&res.a3){skip=["s1","s2","s3"];start="s4";msg="You already work out naturals on both strings, so parts 1 to 3 are collapsed. Start at part 4, sharps and flats.";}
+    const r=ROUTES.find(r=>r.needs.every(k=>res[k]));
+    if(r){skip=r.skip;start=r.start;msg=r.msg;}
     else msg="Start at part 1. Each part builds on the one before.";
     if(!res.tune)msg="Tune first with a tuner app. "+msg;
   }
@@ -414,12 +421,14 @@ const FADE_BLANKS=["D","F","G"];
 })();
 /* naturals where every string separates every misconception: the test-me pool */
 const HARD_NAT=NAT.filter(n=>STRINGS.every(s=>fretSeparates(n,s.open)));
-let findMarks=[];
+let findMarks=[],testLeft=0;
+const TEST_FIND=2;   /* the test: this many clean rounds, each on a different random note */
 function startFind(isTest){
-  const pool=isTest?HARD_NAT:NAT.filter(n=>n!==S.lastFind),target=pick(pool);S.lastFind=target;
+  if(isTest&&!testLeft)testLeft=TEST_FIND;
+  const pool=(isTest?HARD_NAT:NAT).filter(n=>n!==S.lastFind),target=pick(pool);S.lastFind=target;
   const found=new Set(),need=STRINGS.flatMap(s=>fretsOf(target,s.open).map(f=>s.open+":"+f));let wrongClicks=0;findMarks=[];
   $("findTest").hidden=isTest||!!S.done.s3;
-  $("findPrompt").innerHTML=`${isTest?"<strong>Test.</strong> One clean round finishes this part. ":""}Click every <strong>${target}</strong> on both strings (${need.length} spots, frets 0 to ${FRETS}).`;$("findFb").innerHTML="";
+  $("findPrompt").innerHTML=`${isTest?`<strong>Test, round ${TEST_FIND-testLeft+1} of ${TEST_FIND}.</strong> ${cap(WORD[TEST_FIND])} clean rounds on different notes finish this part. `:""}Click every <strong>${target}</strong> on both strings (${need.length} spots, frets 0 to ${FRETS}).`;$("findFb").innerHTML="";
   board($("boardFind"),{marks:findMarks,onPick:(g,s,n)=>{if(g.dataset.done)return;const ok=need.includes(s.open+":"+n),lab=both(s.open+n);
     findMarks.push({i:STRINGS.indexOf(s),n,lab,ok});mark(g,lab,ok);pluck(s.open+n);
     const fb=$("findFb");if(ok){found.add(s.open+":"+n);fb.className="fb ok";fb.innerHTML=`<p>${target}: ${s.name} string, fret ${n}. ${need.length-found.size} to go.</p>`;}
@@ -428,10 +437,11 @@ function startFind(isTest){
     if(found.size===need.length){
       const clean=wrongClicks===0;fb.className="fb "+(clean?"ok":"no");
       if(clean)S.findClean=(S.findClean||0)+1;
-      const finished=clean&&(isTest||S.findClean>=CLEAN_ROUNDS);
-      fb.innerHTML=`<p class="verdict">All ${need.length} found${clean?", clean.":`, with ${wrongClicks} wrong click${wrongClicks>1?"s":""}.`}</p><p>${finished?"This part is done.":isTest?"Not clean, so back to practice rounds. That's normal.":clean?`${S.findClean} of ${CLEAN_ROUNDS} clean rounds.`:"Only clean rounds count, so a wrong click can't be made up by clicking everything."}</p>`;
+      if(isTest)testLeft=clean?testLeft-1:0;
+      const finished=clean&&(isTest?testLeft===0:S.findClean>=CLEAN_ROUNDS),more=isTest&&clean&&!finished;
+      fb.innerHTML=`<p class="verdict">All ${need.length} found${clean?", clean.":`, with ${wrongClicks} wrong click${wrongClicks>1?"s":""}.`}</p><p>${finished?"This part is done.":more?"One more test round, on a new note.":isTest?"Not clean, so back to practice rounds. That's normal.":clean?`${S.findClean} of ${CLEAN_ROUNDS} clean rounds.`:"Only clean rounds count, so a wrong click can't be made up by clicking everything."}</p>`;
       if(finished){done("s3");$("findTest").hidden=true;}
-      else{save();fb.append(h("button",{class:"btn quiet",type:"button",text:"Another note",onclick:()=>startFind(false)}));}}}});
+      else{save();fb.append(h("button",{class:"btn quiet",type:"button",text:more?"Next test note":"Another note",onclick:()=>startFind(more)}));}}}});
 }
 $("findTest").onclick=()=>startFind(true);
 
@@ -440,21 +450,25 @@ document.querySelectorAll("[data-calc]").forEach(e=>{const[n,o]=e.dataset.calc.s
 const ACC_POOL=STRINGS.flatMap(s=>NAT.flatMap(L=>["#","b"].map(a=>L+a))
   .filter(n=>pc(n)>=0&&!["E#","B#","Fb","Cb"].includes(n)).map(n=>[n,s.open])).filter(([n,o])=>fretSeparates(n,o));
 const OPEN_FLATS=STRINGS.map(s=>[nameAt(s.open)+"b",s.open]);   /* the catch: a flat of the open note */
-let streak=0;
+let streak=0,testSet=[];
+/* the test: a random open-string flat (the catch), a random sharp and a random other flat; all three right */
+const makeTest=()=>shuffle([pick(OPEN_FLATS),pick(ACC_POOL.filter(([n])=>n[1]==="#")),pick(ACC_POOL.filter(([n,o])=>n[1]==="b"&&fretOf(n[0],o)>0))]);
 function sharpRound(isTest){
-  const[note,open]=isTest?pick(OPEN_FLATS):pick(ACC_POOL),f=fretOf(note,open),base=fretOf(note[0],open),acc=note[1];
+  if(isTest&&!testSet.length)testSet=makeTest();
+  const[note,open]=isTest?testSet[0]:pick(ACC_POOL),f=fretOf(note,open),base=fretOf(note[0],open),acc=note[1];
+  const testNo=4-testSet.length;
   const box=$("sharpQ");box.innerHTML="";const fs=h("fieldset",{class:"q"});fs.append(h("legend",{text:`${isTest?"Test. ":""}Which fret is ${note} on the ${strName(open)} string?`}));
   const inp=h("input",{type:"number",class:"fret",id:"sf",min:"0",max:"12",inputmode:"numeric","aria-label":"fret number"}),b=h("button",{class:"btn",type:"button",text:"Check"}),fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
-  fs.append(h("div",{class:"row"},inp,b,h("span",{class:"note",text:isTest?"One right answer finishes this part":`${streak} of ${STREAK_S4} in a row`})),fb);box.append(fs);
+  fs.append(h("div",{class:"row"},inp,b,h("span",{class:"note",text:isTest?`Test ${testNo} of 3. All three right finishes this part`:`${streak} of ${STREAK_S4} in a row`})),fb);box.append(fs);
   b.onclick=()=>{if(inp.value===""){fb.textContent="Type a fret number.";return;}
     const v=+inp.value,ok=v===f;if(!ok)missed(note,open);
-    if(isTest)streak=0;else streak=ok?streak+1:0;
+    if(isTest){streak=0;if(ok)testSet.shift();else testSet=[];}else streak=ok?streak+1:0;
     const how=acc==="#"?`${note[0]} is fret ${base}, so ${note} is fret ${f}.`:base===0?`${note[0]} is the open string, so use ${note[0]} at fret 12 and come back one: fret ${f}.`:`${note[0]} is fret ${base}, so ${note} is fret ${f}.`;
     const k=ok?null:fretMatch(note,open,v);
     fb.className="fb "+(ok?"ok":"no");fb.innerHTML=`<p class="verdict">${ok?"Right.":`Fret ${v} is ${both(open+v)}.`}</p><p>${k?`That's where it would be if ${WRONG[k].says}. `:""}${how}</p>`;b.disabled=true;
-    const finished=ok&&(isTest||streak>=STREAK_S4);
-    if(finished){fb.append(h("p",{text:isTest?"Test passed. On to the guitar.":`${cap(WORD[STREAK_S4])} in a row. On to the guitar.`}));done("s4");$("sharpTest").hidden=true;}
-    else{if(isTest)fb.append(h("p",{text:"Back to practice for a few. That's the normal shape of it."}));fb.append(h("button",{class:"btn quiet",type:"button",text:"Next note",onclick:()=>sharpRound(false)}));save();}};
+    const finished=ok&&(isTest?!testSet.length:streak>=STREAK_S4),more=isTest&&ok&&!finished;
+    if(finished){fb.append(h("p",{text:isTest?"Three of three. Test passed. On to the guitar.":`${cap(WORD[STREAK_S4])} in a row. On to the guitar.`}));done("s4");$("sharpTest").hidden=true;}
+    else{if(isTest&&!ok)fb.append(h("p",{text:"Back to practice for a few. That's the normal shape of it."}));fb.append(h("button",{class:"btn quiet",type:"button",text:more?"Next test note":"Next note",onclick:()=>sharpRound(more)}));save();}};
 }
 $("sharpTest").onclick=()=>sharpRound(true);
 sharpRound(false);
@@ -531,15 +545,19 @@ function gradeRetr(it,raw){
   const ok=pairs.length===want.length&&want.every(p=>pairs.includes(p));
   return {ok,why:`The one-fret pairs are ${want.map(p=>p[0]+"-"+p[1]).join(" and ")}${ok?".":"; every other pair of neighbours is two frets apart."}`};
 }
+/* recall has to be fast enough to play on the next downbeat: one bar at the goal tempo.
+   Measured from the first keystroke's focus to Check, never enforced; slow counts as a miss for the schedule. */
+const RECALL_S=4*60/GOAL_BPM;
 function retrieval(){
   const box=$("retr");box.innerHTML="";const items=retrItems();let n=0,miss=0;
   items.forEach((it,i)=>{const fs=h("fieldset",{class:"q"});fs.append(h("legend",{text:`${i+1}. ${it.q}`}));
     const inp=h("input",{type:it.kind==="fret"?"number":"text",class:it.kind==="fret"?"fret":"word",autocomplete:"off","aria-label":"your answer",inputmode:it.kind==="fret"?"numeric":"text"});
     const b=h("button",{class:"btn",type:"button",text:"Check"}),fb=h("div",{class:"fb",role:"status","aria-live":"polite"});
-    fs.append(h("div",{class:"row"},inp,b),fb);box.append(fs);
+    fs.append(h("div",{class:"row"},inp,b),fb);box.append(fs);let t0=null;inp.addEventListener("focus",()=>{if(t0===null)t0=performance.now();});
     b.onclick=()=>{if(!inp.value.trim()){fb.className="fb";fb.textContent="Type an answer first, even a guess.";return;}
-      const g=gradeRetr(it,inp.value);inp.disabled=b.disabled=true;if(!g.ok)miss++;
-      fb.className="fb "+(g.ok?"ok":"no");fb.innerHTML=`<p class="verdict">${g.ok?"Right.":"Not yet."}</p><p>${g.why}</p>`;
+      const g=gradeRetr(it,inp.value),secs=t0===null?0:(performance.now()-t0)/1000,slow=g.ok&&it.kind!=="pairs"&&secs>RECALL_S;
+      inp.disabled=b.disabled=true;if(!g.ok||slow)miss++;
+      fb.className="fb "+(g.ok&&!slow?"ok":"no");fb.innerHTML=`<p class="verdict">${!g.ok?"Not yet.":slow?`Right, but ${secs.toFixed(0)} seconds.`:"Right."}</p><p>${g.why}${slow?` The objective needs it within one bar at ${GOAL_BPM} bpm, about ${RECALL_S} seconds, so this one comes back sooner.`:""}</p>`;
       if(++n===items.length)schedule(miss,items.length);};});
   box.querySelector("input").focus();
 }
@@ -558,7 +576,7 @@ function paintSummary(){
 $("copy").onclick=async()=>{const t=$("summary");try{await navigator.clipboard.writeText(t.value);$("copyMsg").textContent="Copied. Add what you noticed, then paste it in the chat.";}catch(e){t.select();$("copyMsg").textContent="Selected: press Ctrl or Cmd+C.";}};
 
 /* ---------- values named in the text, filled from the constants ---------- */
-const K={goalBpm:GOAL_BPM,calls:CALLS,callsWord:WORD[CALLS],placeCount:cap(WORD[PLACE.length]),cleanWord:cap(WORD[CLEAN_ROUNDS]),dotFrets:DOTS.slice(0,-1).join(", ")+" and "+DOTS.at(-1)};
+const K={recallS:RECALL_S,goalBpm:GOAL_BPM,calls:CALLS,callsWord:WORD[CALLS],placeCount:cap(WORD[PLACE.length]),cleanWord:cap(WORD[CLEAN_ROUNDS]),dotFrets:DOTS.slice(0,-1).join(", ")+" and "+DOTS.at(-1)};
 document.querySelectorAll("[data-k]").forEach(e=>e.textContent=K[e.dataset.k]);
 
 /* ---------- fact checks: every hand-written sentence that names a value, and every fixed item's discrimination ---------- */
@@ -585,8 +603,25 @@ const checks=[
   ["the find test pool is not empty", ()=>HARD_NAT.length>0],
   ["every sharp/flat drill item separates all three misconceptions", ()=>ACC_POOL.length>8&&ACC_POOL.every(([n,o])=>fretSeparates(n,o))],
   ["the part 4 test items separate the direction flip", ()=>OPEN_FLATS.every(([n,o])=>WRONG.flipped.fret(n,o)!==fretOf(n,o))],
-  ["no fixed multiple-choice item has the right answer as the clear longest", ()=>PLACE.every(p=>!mcLint(p).length)]
+  ["no fixed multiple-choice item has the right answer as the clear longest", ()=>PLACE.every(p=>!mcLint(p).length)],
+  ["each gate fails under every misconception the parts it skips repair", ()=>ROUTES.every(r=>r.skip.flatMap(p=>REPAIRS[p]||[]).every(k=>r.needs.some(id=>exposesOf(PLACE.find(p=>p.k===id).item).includes(k))))],
+  ["every route, including the shortest, exposes each misconception at least twice", ()=>[[],...ROUTES.map(r=>r.skip)].every(skip=>Object.keys(WRONG).every(k=>
+    Object.entries(ROUTE_ITEMS()).filter(([p])=>!skip.includes(p)).flatMap(([,v])=>v).filter(it=>exposesOf(it).includes(k)).length>=2))],
+  ["the closing review exposes every misconception", ()=>Object.keys(WRONG).every(k=>ROUTE_ITEMS().s6.some(it=>exposesOf(it).includes(k)))],
+  ["the part 3 test has enough different hard notes", ()=>HARD_NAT.length>TEST_FIND],
+  ["the part 4 test has a sharp, a flat and an open-string flat to draw", ()=>makeTest().length===3&&makeTest().every(x=>x&&fretSeparates(x[0],x[1]))],
+  ["recall limit is one bar at the goal tempo (part 6 text)", ()=>RECALL_S===4*60/GOAL_BPM]
 ];
+/* which misconceptions give a different answer on an item: {note,open} asks for a fret, {open,fret} for a note */
+function exposesOf(it){return it.fret!==undefined&&it.note===undefined
+  ?["allTwo","onePerLetter"].filter(k=>pc(WRONG[k].noteAt(it.open,it.fret))!==(it.open+it.fret)%12)
+  :relevant(it.note).filter(k=>WRONG[k].fret(it.note,it.open)!==fretOf(it.note,it.open));}
+/* items each part guarantees a learner answers. Generated parts use a representative, which the
+   pool checks above make valid: every item in those pools separates the same misconceptions. */
+function ROUTE_ITEMS(){const acc=([note,open])=>({note,open});
+  return {place:PLACE.filter(p=>p.item).map(p=>p.k==="e8"?{open:40,fret:8}:p.item),s1:[HOOK],s3:FADE_BLANKS.map(n=>({note:n,open:45})),
+    s4:Array(STREAK_S4).fill(acc(ACC_POOL[0])),
+    s6:[...STRINGS.map(st=>{let f=1;while(!noteSeparates(st.open,f))f++;return {open:st.open,fret:f};}),acc(ACC_POOL[0])]};}
 function runChecks(){const fails=checks.filter(([,f])=>{try{return !f();}catch(e){return true;}}).map(([t])=>t);
   fails.forEach(t=>console.error("Fact check failed:",t));
   if(DEV&&fails.length)document.body.prepend(h("pre",{class:"checkfail",role:"alert",text:"Fact checks failed:\n"+fails.join("\n")}));return fails;}
