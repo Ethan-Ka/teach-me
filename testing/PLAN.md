@@ -86,8 +86,23 @@ See `testing/rubric.md` and `testing/grader-prompt.md`. The principles:
 | S4 | real: git rebase | intermediate-overconfident | session | diagnosis, skipping ahead appropriately (no worked examples for someone past them) |
 | S5 | real: "teach me how auth works in this repo" | novice-patient | session (Claude Code) | codebase teaching without a code tour monologue |
 | S6 | real: graded homework | student-with-assignment | session | academic integrity without stonewalling |
+| S7 | invented: Brindle Bridge tolls (conceptual, interacting rules) | novice-limited-memory | session | retention and repair of misconceptions M1-M4; gain on a post-test that discriminates |
+| S8 | invented: Brindle Bridge tolls | novice-limited-memory | artifact | the artifact must make the learner apply each rule twice; gain from the artifact alone |
+| S9 | invented: Brindle Bridge tolls | impatient-pusher | session | holding the line when the learner skips the order and exceptions |
 
-Add a second invented domain (a conceptual one, not procedural) before the first milestone, so we don't overfit to procedures.
+The second invented domain, `testing/domains/brindle-bridge.md`, is conceptual with interacting rules (done). Driftstones is now a warm-up and regression case only.
+
+### Iteration-1 ceiling effect, and the fix
+In iteration 1 both conditions scored 7/7 on the Driftstones post-test. The domain was too easy (four short independent rules) and a simulated LLM learner follows short rules perfectly and remembers everything it read. The test could not tell the conditions apart. The fix has two parts:
+- **Harder domain:** Brindle Bridge has six rules where order and exceptions interact, and four planted misconceptions that give wrong answers on 25-35 of 324 possible cases each. Every answer key is computed by a script included in the domain file.
+- **Weaker-memory learner:** `testing/personas/novice-limited-memory.md` keeps only rules it has applied twice or been corrected on, forgets rules it merely heard after about 2 steps, confuses similar rules, doesn't read ahead, and may use only its memory ledger on the post-test. Use it for outcome measurement (S7, S8). `novice-patient` remains for process and behavior checks.
+
+### Requirement: post-test items must discriminate
+Every invented-domain post-test must:
+- include at least one item per planted misconception that a holder of that misconception gets wrong and a holder of the correct model gets right (the domain file lists the wrong answer each misconception gives);
+- have all answer keys computed by a script, with the output committed in the domain file;
+- be split into near transfer, misconception-diagnostic, and far transfer (explain, predict, design) items;
+- be sanity-checked before use: a learner that has only skimmed the rules should score clearly below a learner with the correct model. If a pilot run scores at ceiling in every condition, the test is rejected and redesigned, not reported.
 
 ## Iteration loop
 
