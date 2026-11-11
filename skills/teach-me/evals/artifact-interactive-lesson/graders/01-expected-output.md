@@ -1,0 +1,7 @@
+---
+type: llm
+focus: trace
+weight: 1
+---
+
+The result matches this description: The response produces a single self-contained HTML file that is a learning sequence, not a reference document. The lesson states one to three concrete objectives (for example, explain why the handshake needs three messages rather than two, trace sequence and acknowledgment numbers through the handshake, predict what happens when a packet is lost). It opens with an activation question or prediction before explaining. Content is chunked one idea per section, and each section has a brief explanation, a worked example, and an exercise that requires the learner to produce or decide something (predict the next packet, fill in an ack number, choose what happens on loss), with feedback that explains why an answer is right or wrong, not just correct or incorrect. Support fades: later exercises give less help than earlier ones. It ends with mixed retrieval questions answered without looking back and a short 'now do it yourself' task suited to interview prep, such as explaining the handshake aloud or tracing a fresh example. The technical content is accurate, it explains the mechanism (why three steps) rather than only naming the packets, and no visual simply animates the whole handshake with nothing for the learner to do.

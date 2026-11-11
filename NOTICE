@@ -1,0 +1,13 @@
+teach-me
+
+This project includes a Claude skill derived from Anthropic's `learn` skill,
+which is licensed under the Apache License, Version 2.0.
+
+The file skills/teach-me/SKILL.md has been modified from the original `learn`
+skill: its content has been merged with new and revised material on gradual
+release, instructional artifact design, and related teaching guidance.
+
+The unmodified original is kept in upstream/learn/ (SKILL.md and LICENSE.txt).
+
+Licensed under the Apache License, Version 2.0. A copy of the license is in
+skills/teach-me/LICENSE.txt and upstream/learn/LICENSE.txt.

@@ -1,0 +1,7 @@
+.DS_Store
+skills/teach-me-workspace/
+skills/teach-me/evals/results/
+testing/results/
+__pycache__/
+*.pyc
+.env
