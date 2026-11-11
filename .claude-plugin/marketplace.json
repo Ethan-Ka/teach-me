@@ -1,0 +1,11 @@
+{
+  "name": "teach-me-marketplace",
+  "owner": { "name": "Ethan Kawley" },
+  "plugins": [
+    {
+      "name": "teach-me",
+      "source": "./",
+      "description": "Teaches so you learn: guides, checks, hands over the work."
+    }
+  ]
+}
