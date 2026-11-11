@@ -730,6 +730,47 @@ Keep `ROUTES` derived from the same table the routing code reads, so the check c
 
 **Also run it on fixed items.** For the hook, each placement item and the final check, add one line per item to the page's `checks` array asserting that the right answer differs from each misconception's (section 10).
 
+**Before shipping, run simulated holders through the real page.** The load-time checks read the page's tables; they can't see a misconception missing from `WRONG`, and they treat a random draw through one representative. So run each misconception as a learner. In iteration 3 a page passed every coverage check, yet a holder of an error its list lacked (a scope error, with a near-miss "no cap" slip listed in its place) placed out of all five parts, and in 1 seed of 200 finished with no confrontation at all. *(Practitioner, one probe; v0 as a rule.)*
+
+Write the variants from your own derivation, not from the page's catalogue, so the run tests the list as well as the routing. Expose a small test hook in the page, seed `Math.random` before the page script runs, and drive the shortest route: pass placement, take "I've got this, test me" wherever offered, never "do it anyway".
+
+```js
+// sim.mjs: node sim.mjs lesson.html   (Playwright; the page exposes window.__lesson)
+import { chromium } from "playwright";
+const HOLDERS = ["leftToRight", "addAll"];   // every misconception you derived, as names in page WRONG
+const SEEDS = 200, browser = await chromium.launch(), page = await browser.newPage();
+const out = {};
+for (const name of HOLDERS) {
+  const runs = [];
+  for (let seed = 1; seed <= SEEDS; seed++) {
+    await page.addInitScript(s => {            // seeded mulberry32, installed before the page's script
+      let t = s; Math.random = () => { t = (t + 0x6D2B79F5) | 0; let r = Math.imul(t ^ (t >>> 15), 1 | t);
+        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r); return ((r ^ (r >>> 14)) >>> 0) / 4294967296; };
+    }, seed);
+    await page.goto("file://" + process.argv[2]);
+    runs.push(await page.evaluate(name => {
+      const L = window.__lesson; let confronted = 0; const passed = [];
+      L.answerWith(item => {                    // every item the page actually shows on this route
+        const a = L.WRONG[name](item);
+        if (a !== L.RIGHT(item)) confronted++;
+        return a;
+      });
+      L.onGatePassed(g => passed.push(g));      // mastery streaks, "test me", the closing set
+      L.takeShortestRoute();
+      return { confronted, passed };
+    }, name));
+  }
+  const c = runs.map(r => r.confronted);
+  out[name] = { min: Math.min(...c), median: c.sort((a, b) => a - b)[SEEDS >> 1],
+                seedsBelow2: runs.filter(r => r.confronted < 2).length,
+                gatesPassedWhileHolding: runs.filter(r => r.passed.length).length };
+}
+console.table(out); await browser.close();
+// Ship only if, for every holder, min >= 2 and gatesPassedWhileHolding === 0.
+```
+
+Read the minimum, not the mean: a median of 2 hid the seed with 0. If a holder fails, the fix is usually a placement item that the misconception gets wrong (so it can't place out), or adding it to `WRONG` so the streak and "test me" aim at it. Without Playwright, the same loop runs in node by loading the page's script into `vm` with a stub DOM, as long as routing and generators don't depend on layout.
+
 ## 6. Honor-system patterns for physical skills
 
 The page can't observe a motor skill, so the check is observable criteria plus an external reference plus honest self-report, and the self-report changes the plan. See `artifact-blueprint.md` section 12 for the design; this is the mechanics.
@@ -979,6 +1020,7 @@ If no browser is available, say so in the hand-over, and say which checks were d
 - [ ] Generators filtered to discriminating items, rate measured; non-discriminating items flagged and never counted toward mastery.
 - [ ] Practice ends on a mastery criterion whose streak has exposed every targeted misconception; "test me" is two or three random items covering them all.
 - [ ] `checks` asserts that every route, including the shortest, exposes each misconception twice, that each gate fails under the misconceptions it skips, and that the closing set covers all of them.
+- [ ] Simulated holders, written from your own derivation (including scope and boundary errors), run through the real routing and generators over about 200 seeds: minimum confrontations at least 2 on the shortest route, and no mastery or closing gate passed while holding one.
 - [ ] Placement items appear one at a time; no item's options or feedback reveal another's answer.
 - [ ] Recall drills timed where the shortcut is counting; right-but-slow kept out of mastery.
 - [ ] Multiple choice: options similar in length and grammar, wrong options from named misconceptions, order shuffled, `mcLint` clean.
