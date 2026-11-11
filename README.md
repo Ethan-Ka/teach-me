@@ -20,7 +20,7 @@ Left alone, Claude tends to demonstrate. You ask how something works, you get a 
 2. In Settings > Capabilities, turn on code execution and file creation. Skills need it.
 3. In Customize > Skills, upload the zip and switch the skill on.
 
-If the upload rejects the description as too long, run `scripts/package.sh --short` and upload the new `dist/teach-me.zip`. That build uses a 200 character description.
+The zip uses a short description, because the Claude app allows 200 characters. Claude Code and the plugin keep the full one; run `scripts/package.sh --long` if you want it in the zip too.
 
 ## Install in Claude Code
 

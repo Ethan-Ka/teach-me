@@ -129,18 +129,20 @@ Hint ladder for bugs: "where does it fail?", then "what's the value of X there?"
 
 ## 7. Teaching a codebase: one path, not a tour
 
-"Help me understand how auth works here, so I can work in it" is a request to be able to act in the code. A tour of every directory is a demo: the learner nods along and retains a list of folder names. Newcomers build understanding by following one concrete feature through the code, mixing top-down guesses with bottom-up reading. (This section is v0: it's built on PRIMM and program-comprehension research, not on a controlled study of teaching codebases.)
+"Help me understand how auth works here, so I can work in it" is a request to be able to act in the code. A tour of every directory is a demo: the learner nods along and retains a list of folder names. Newcomers build understanding by following one concrete feature through the code, mixing top-down guesses with bottom-up reading. Studies of developers making changes find they ask a recurring set of questions (where is this, what calls it, what breaks if I change it, is this the right place), and that questions about design intent, why it's built this way, are the hardest to answer from the code (Moderate: Sillito et al. 2006; Ko et al. 2007). Shape the session around those questions, not around the directory listing. (The method as a whole is v0: no study has tested a way of teaching a codebase, and the supporting work observed professional developers on small samples.)
 
 1. **Ask what they need to do.** Fix a bug in login? Add an OAuth provider? Review a PR? The purpose decides which path to trace.
 2. **Read it yourself first.** You need to know the path to check their predictions. Don't guess about code you haven't read.
 3. **A five-line map.** The main parts and how they relate, no more. "Requests come in through `routes/`, auth checks live in `middleware/auth.ts`, users are in the `users` table via `models/user.ts`, sessions are in Redis."
 4. **Pick one concrete entry point:** a route, a CLI command, a test. "Let's follow what happens when someone POSTs to `/login`."
-5. **At each hop, the learner predicts first.** "The route handler calls `authenticate(req)`. Where do you think that's defined, and what do you expect it returns?" Then open the file together and check.
+5. **At each hop, the learner predicts first.** "The route handler calls `authenticate(req)`. Where do you think that's defined, and what do you expect it returns?" Then open the file together and check. Pitch the prediction to the learner: a novice predicts what a function returns for an input or explains a snippet in plain English (tracing and explaining correlate with writing code, Moderate); an experienced engineer predicts the system-level step ("which service handles this, where does config load"), since tracing trivial code wastes their time.
 6. **After each hop, a restatement.** "In one line: what does `authenticate` take and give back?"
 7. **Let them run it.** A test, a request with `curl`, a print statement, a breakpoint. Seeing the real values beats reading about them.
 8. **Close with a solo trace.** "Now trace what happens on logout, and tell me which files it touches." Or: "Where would you add a check that blocks banned users?"
 
-**Things that go wrong:** explaining the whole architecture before any code; reading files aloud to the learner; tracing three paths at once; making the change for them when the goal was for them to be able to make it.
+**Say what the code shows about intent, and what it doesn't.** When comments, commit messages or `git blame` reveal why something is built this way, show them. When nothing does, say "I can't tell why from the code" instead of a confident guess; intent is what newcomers most need and least often find.
+
+**Things that go wrong:** explaining the whole architecture before any code; a long narrated tour of files (it feels thorough and asks nothing of the learner); reading files aloud to the learner; tracing three paths at once; novice-style prediction tasks for an experienced engineer; guessing at design intent; asking them to predict code you haven't read; handing over a reference doc as the lesson (offer it after they've traced something); making the change for them when the goal was for them to be able to make it.
 
 ## 8. Claude Code specifics
 
@@ -236,7 +238,7 @@ For graded coursework: explain concepts, debug the error they show you, and revi
 - Parsons problems: Moderate to Strong (Ericson et al.; ITiCSE 2023 working group; search summaries).
 - Subgoal labels: Moderate (Margulieux, Catrambone and Guzdial 2016; search summary).
 - Notional machines: Moderate as a field concept (Fincher et al. 2020; abstract).
-- Codebase teaching by one path: Practitioner, v0 (program-comprehension studies on top-down and bottom-up reading; no intervention study found).
+- Codebase teaching by one path: v0 (no intervention study found; newcomer-barrier reviews cover barriers, not teaching). Its parts have support: developers' recurring questions and the difficulty of design intent, Moderate (Sillito et al. 2006; Ko et al. 2007); tracing and explaining before writing, Moderate and correlational (Lopez et al. 2008; Xie et al. 2019 for skill-ordered teaching), for novices only.
 - Debugging loop, Claude Code and app specifics, experienced-learner contrasts: Practitioner.
 
-<!-- Sources: research/notes/F-domain-pedagogy.md (PRIMM, Parsons, subgoal labels, notional machines, codebase tracing); research/notes/A-tell-guide-do.md (expertise reversal for experienced programmers, decorator example); research/notes/B-diagnosis-feedback.md (hinge question on range, checks in chat); research/notes/C-expert-tutoring.md (step-level responsiveness); research/notes/G-ai-tutoring.md (solve first, guardrails); research/notes/distribution.md (Claude Code vs claude.ai capabilities). -->
+<!-- Sources: research/notes/J-domain-gaps.md section 3 (developer questions, design intent, tracing before writing, code-tour monologue; v0 overall); research/notes/F-domain-pedagogy.md (PRIMM, Parsons, subgoal labels, notional machines, codebase tracing); research/notes/A-tell-guide-do.md (expertise reversal for experienced programmers, decorator example); research/notes/B-diagnosis-feedback.md (hinge question on range, checks in chat); research/notes/C-expert-tutoring.md (step-level responsiveness); research/notes/G-ai-tutoring.md (solve first, guardrails); research/notes/distribution.md (Claude Code vs claude.ai capabilities). -->

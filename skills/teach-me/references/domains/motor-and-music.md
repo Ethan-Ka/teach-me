@@ -1,6 +1,6 @@
 # Teaching motor skills and music
 
-Instruments, sport, drawing, dance, typing, handwriting, anything done with the body. You can't see or hear the learner, and neither can an artifact you build (no microphone pitch detection, no computer vision). So self-assessment is part of the deal, and most of the teaching is practice design. Much of this file is Practitioner or v0; the research found little direct evidence on coaching a physical skill without observing it. The heaviest input is a guitar teacher's teardown of a Claude-built course that failed.
+Instruments, sport, drawing, dance, typing, handwriting, anything done with the body. You can't see or hear the learner, and neither can an artifact you build (no microphone pitch detection, no computer vision). So self-assessment is part of the deal, and most of the teaching is practice design. Much of this file is Practitioner; there's still no study of coaching a physical skill you can't observe. Motor-learning research (note J) now backs a few parts, at abstract level and mostly from lab tasks: self-video with something to look for, practice strategy over hours, and, with real disputes, result-focused cues and mixed practice. The heaviest input is a guitar teacher's teardown of a Claude-built course that failed.
 
 ## Contents
 
@@ -13,15 +13,17 @@ Instruments, sport, drawing, dance, typing, handwriting, anything done with the 
 7. Record and compare
 8. The "not yet" path
 9. The report-back loop
-10. Perception before symbol (ear and feel)
-11. Physical safety
-12. Move-on bar vs mastery bar
-13. A session plan
-14. Verify every tab, chord and count
-15. What not to build
-16. Beyond music
-17. Mini-transcripts
-18. Evidence notes
+10. Cues, feedback timing and practice order
+11. Perception before symbol (ear and feel)
+12. Physical safety
+13. Move-on bar vs mastery bar
+14. A session plan
+15. Verify every tab, chord and count
+16. What not to build
+17. Beyond music
+18. Mistakes to avoid
+19. Mini-transcripts
+20. Evidence notes
 
 ---
 
@@ -105,6 +107,8 @@ Listening back catches what playing hides; watching back catches what doing hide
 - **Compare to yourself.** Keep the day-1 recording. Record the same passage on day 7 and compare against the same checklist. Visible progress is a strong reason to keep going.
 - **Slow-motion video** for technique: the picking hand, a golf swing, a tennis toss. Give a short checklist of what to look for.
 
+Video of one's own performance helped motor learning and beat verbal feedback alone in physical-education studies, and learners who chose when to watch learned more (Moderate: Mödinger et al. 2021; Ste-Marie et al. 2013). A novice watching a take may not know what to look at, which is why the three-item checklist matters (Practitioner).
+
 ## 8. The "not yet" path
 
 Every criterion gets a named next step for failure, and "not yet" is presented as the normal result of a first try.
@@ -113,7 +117,7 @@ Every criterion gets a named next step for failure, and "not yet" is presented a
 |---|---|
 | "The C chord buzzes on the B string" | "Your index finger is probably flat or mid-fret. Press just behind the fret wire with the fingertip. Place and lift that one finger 10 times, checking the B string each time." |
 | "I can't make the change in time" | "Drop to 40 bpm. Practice only the move: last beat of G into the first beat of C. Lead with the finger that moves least." |
-| "My hand hurts" | Stop. See section 11. |
+| "My hand hurts" | Stop. See section 12. |
 | "I keep rushing at the changes" | "Count out loud. Record it. Is the rush on the beat before the change? Practice that beat alone, with the click." |
 | "Not yet" twice on the same rung | Change the plan: a smaller unit, a prerequisite drill, or a different fingering. Don't repeat the same drill a third time. |
 
@@ -137,7 +141,17 @@ Say what you can't judge: "I can't hear the tone, so I'm going on your descripti
 
 If the learner can share a recording, photo or video and your environment can take it, use it, and say what you can and can't judge from it. Don't make confident technique claims you can't check.
 
-## 10. Perception before symbol (ear and feel)
+## 10. Cues, feedback timing and practice order
+
+- **Ask for their judgment before giving yours.** "What did you notice?" first, then your read, and don't comment on every attempt. The idea that less frequent feedback builds independence is Contested in the lab, but in chat reports arrive in batches anyway, and their own judgment is the skill being trained.
+- **Ask for counts, not feelings.** "Out of 10 tries at 60 bpm, how many were clean? Which beat drifts?" beats "how did it go?" Use the count to set the next step (4 of 5 clean: up one notch; under 3 of 5: slow down), and say plainly that it's self-reported. Novices tend to overrate themselves, so prefer checks with an outside reference: the metronome, a recording, a tuner (Practitioner).
+- **Give a countable exit criterion for each stage.** Popular guitar courses stage practice around one: time a minute of changes between two chords, count them, and move on past a stated number. A number a learner can reach and report beats "until it feels smooth" (Practitioner; the exact thresholds are creators' targets).
+- **Prefer cues about the result over cues about the body,** as a default to test. "Let the string ring clean" over "curl your finger more"; "aim the chisel edge at the line" over "keep your elbow in". A large meta-analysis favored this external focus (Chua et al. 2021), but a 2024 reanalysis attributes much of the effect to selective reporting (McKay et al. 2024), and the studies are lab tasks with simple targets. Contested. Use a body cue when the learner can't make the movement at all.
+- **Blocked first, mixed later.** Repeat the one change until it's clean, then in a later session mix variants (A to D, D to E, E to A in random order). Warn them mixed practice feels harder and looks worse on the day. Contested: the benefit of mixing shows mostly in lab studies and older adults, and is small and non-significant in applied studies.
+- **Plan practice by strategy, not minutes.** In one study of pianists, what they did in practice (targeting errors, slowing down) predicted next-day performance better than how long they practiced (Moderate, small: Duke, Simmons and Cash 2009, one session).
+- **Run it as a submit-and-review loop.** "Record one minute. Check these three things. Come back and tell me. Here's your one assignment until then." This is how online music coaches work asynchronously (Practitioner, vendor sources only).
+
+## 11. Perception before symbol (ear and feel)
 
 For a perceptual-motor skill, the named fact has to be tied to the sensation it stands for, in the drill itself. The failed guitar course described sounds in adjectives ("bright," "a hair sharp") and taught note names as a purely visual task, and its listening checks depended on an ear it hadn't trained yet.
 
@@ -149,7 +163,7 @@ What to do (v0, practice-based; ear-training research wasn't covered):
 - **Use an outside reference for checks the ear can't make yet:** a tuner for pitch, a metronome for time, a recording for comparison.
 - **Train the ear alongside the hands** from the start, in short doses, rather than as a later unit.
 
-## 11. Physical safety
+## 12. Physical safety
 
 Name the risks a teacher in the room would catch, and add a self-check for each. Never make a risky movement a pass requirement.
 
@@ -161,7 +175,7 @@ Name the risks a teacher in the room would catch, and add a self-check for each.
 - **Don't require them.** The failed course made whole-step bends with each of the four fingers (including the unsupported pinky) a pass requirement. Drop risky movements from pass criteria.
 - **For sport and exercise:** if the learner mentions an injury, pain or a medical condition, suggest a qualified coach or clinician for that part, and keep your advice general.
 
-## 12. Move-on bar vs mastery bar
+## 13. Move-on bar vs mastery bar
 
 The failed course gated every lesson on a mastery criterion that took weeks ("name any note on any string in about a second, twenty in a row"). The learner either stalled or clicked "mark done" without passing, and the review schedule then ran on false data.
 
@@ -171,9 +185,9 @@ The failed course gated every lesson on a mastery criterion that took weeks ("na
 - **Long habits are not gates.** "Record yourself monthly for a year" is a habit to keep, not a lesson to pass.
 - **Run parallel tracks** for a longer course (for guitar: technique, fretboard knowledge, ear, songs), so being stuck on one doesn't block the others.
 
-## 13. A session plan
+## 14. A session plan
 
-For a 20 to 30 minute practice session (v0; the shape follows common teaching practice, and the JustinGuitar course structure was a lead that couldn't be verified):
+For a 20 to 30 minute practice session (v0; the shape follows common teaching practice. JustinGuitar's official pages, seen only as search snippets, describe about 20-minute sessions with a minute per chord-change pair, which fits but isn't verified):
 
 > **Warm-up (3 min):** something easy from earlier work, to get hands moving.
 > **Review (5 min):** one earlier skill, tested against its criterion. Record pass or miss.
@@ -185,7 +199,7 @@ Always end by playing music, or doing the real thing.
 
 If the learner's time is short, split into two shorter sessions in the day. A plan should fit the time they told you they have.
 
-## 14. Verify every tab, chord and count
+## 15. Verify every tab, chord and count
 
 The failed guitar course had about 30 wrong tabs and note labels, written from memory. Compute every one (see `topic-research.md` section 10 for a fretboard function):
 
@@ -199,7 +213,7 @@ The failed guitar course had about 30 wrong tabs and note labels, written from m
 
 Generate tab, diagrams and answer keys from the same function so they can't disagree.
 
-## 15. What not to build
+## 16. What not to build
 
 Stay within what a chat and a static page can do:
 
@@ -208,7 +222,7 @@ Stay within what a chat and a static page can do:
 
 A widget only earns a place if a step in the lesson tells the learner to use it and asks them something with it.
 
-## 16. Beyond music
+## 17. Beyond music
 
 The same design works for any physical skill:
 
@@ -218,9 +232,18 @@ The same design works for any physical skill:
 - **Handwriting or calligraphy:** a model letter to compare against, a photo of their attempt, a few observable criteria (consistent slant, baseline).
 - **Cooking technique:** observable outcomes (even dice size, a measured thickness), a photo against a reference.
 
-## 17. Mini-transcripts
+## 18. Mistakes to avoid
 
-### 17.1 Bad
+- Praising technique you can't observe.
+- A body-part instruction ("elbow in") as the only cue.
+- "Practice 10,000 hours" or minutes-based plans with no criterion.
+- Commenting on every attempt.
+- Presenting external focus or blocked-versus-mixed as settled.
+- A page that pretends to detect pitch, rhythm or posture.
+
+## 19. Mini-transcripts
+
+### 19.1 Bad
 
 > **Learner:** I can play G, C, D, Em and Am. How do I get better?
 >
@@ -228,7 +251,7 @@ The same design works for any physical skill:
 
 *What went wrong:* ignores what they play, no song, months of prerequisites, no criterion, nothing to report back, and cheerleading in place of a next step.
 
-### 17.2 Good
+### 19.2 Good
 
 > **Learner:** I can play G, C, D, Em and Am. How do I get better?
 >
@@ -244,14 +267,20 @@ The same design works for any physical skill:
 
 *Why:* starts from their chords, uses a real song from day one, smallest unit that fails, a tempo, an observable count, one thing to attend to, and a report-back. (The song's chords were checked: the common arrangement uses G, D, Am, C.)
 
-## 18. Evidence notes
+## 20. Evidence notes
 
 - Honor-system self-check design (observable criteria, record and compare, calibration, not-yet path, report back): Practitioner, built on the feedback evidence (area B) and the fretboard teardown.
-- Feedback on physical skill without observation: no source found; v0 (note F).
+- Feedback on physical skill without observation: no direct study found (notes F, J). Counts with an outside reference: Practitioner. Learner's judgment first: Practitioner; feedback-frequency research is Contested.
+- Self-video with a checklist: Moderate (Mödinger et al. 2021; Ste-Marie et al. 2013; abstract-level).
+- External focus of attention: Contested (Chua et al. 2021 vs McKay et al. 2024).
+- Blocked then mixed practice: Contested (weak in applied studies, 2024 meta-analysis).
+- Practice strategy over time: Moderate, small (Duke et al. 2009).
+- Countable exit criterion per stage: Practitioner (JustinGuitar, snippets only; note I pass 2).
+- Submit-and-review loop: Practitioner (vendor sources).
 - Slow practice and chunking: Practitioner to Moderate, survey and interview studies; low confidence (note F).
 - Deliberate practice: Contested (Macnamara et al. 2014: about 21% of variance in music; corrected figures higher).
 - Start from what they play, songs early, move-on vs mastery bars, physical safety, perception before symbol: the guitar teacher's teardown (03), lessons 2, 3, 5, 10, and the learner walkthrough (02).
-- Session plan: v0 (JustinGuitar structure unverified, note I finding 3).
+- Session plan: v0 (JustinGuitar structure seen only in snippets, note I).
 - Ear training: v0, not researched.
 
-<!-- Sources: research/notes/F-domain-pedagogy.md (motor and music: deliberate practice, slow practice, the ear, feedback without observation); research/notes/B-diagnosis-feedback.md finding 5 (honor-system checks); research/notes/D-retention.md finding 5 (honor-system self-testing); research/notes/E-artifact-design.md findings 5 and 8 (tempo ladder, not-yet path, report-back box, course structure); research/notes/I-video-educators.md finding 3 (JustinGuitar, unverified); research/baseline/fretboard-teardown/01-instructional-design.md F16, F19-F21, F27, F28, F35, F36, root causes 1, 2, 5, 8; 02-learner-walkthrough.md (quit point, mastery-cliff, missing-physical-prereq, wrong-learner); 03-guitar-teacher.md (verdict, factual errors, physical risk row, first-two-weeks plan, lessons 1-12). -->
+<!-- Sources: research/notes/F-domain-pedagogy.md (motor and music: deliberate practice, slow practice, the ear, feedback without observation); research/notes/B-diagnosis-feedback.md finding 5 (honor-system checks); research/notes/D-retention.md finding 5 (honor-system self-testing); research/notes/E-artifact-design.md findings 5 and 8 (tempo ladder, not-yet path, report-back box, course structure); research/notes/I-video-educators.md finding 3 and pass 2 P2-7 (JustinGuitar exit criterion, snippets only); research/notes/J-domain-gaps.md section 4 (external focus, self-video, honor-system counts, feedback frequency, blocked vs random, practice strategy, async coaching, mistakes to avoid); research/baseline/fretboard-teardown/01-instructional-design.md F16, F19-F21, F27, F28, F35, F36, root causes 1, 2, 5, 8; 02-learner-walkthrough.md (quit point, mastery-cliff, missing-physical-prereq, wrong-learner); 03-guitar-teacher.md (verdict, factual errors, physical risk row, first-two-weeks plan, lessons 1-12). -->

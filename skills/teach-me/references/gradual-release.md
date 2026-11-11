@@ -65,6 +65,8 @@ How to use it: pick the cell, make the move, then re-pick after the learner's ne
 
 Two defaults are worth memorizing. A **procedure with a novice** starts with a worked example and a near-copy, not an open question. A **concept with a partial learner** starts with a prediction, not an explanation.
 
+**How strong explainers open a concept.** Two moves recur in well-regarded teaching videos and fit the table. For a novice, put one concrete case before the rule (one specific search through a row of lockers, then the idea of halving) and keep reusing that case as the idea grows, because a learner with no foothold has nothing for an abstract rule to attach to; for someone fluent, the rule first is often faster. Where people bring a wrong intuition, make the prediction a forced choice of two to four answers with the popular wrong one among them, and hold the answer until they've picked. A learner who has committed has something for the explanation to correct; one who hasn't tends to read the right answer and feel they knew it.
+
 ## 4. The contingency rule
 
 > After a miss, give one level more help. After a clean success, give one level less, or add one variation, but not both.
@@ -353,5 +355,6 @@ See `domains/motor-and-music.md`.
 - Subgoal labels: Moderate (Margulieux, Catrambone, Guzdial; search summary).
 - Correct vs incorrect examples: Moderate (Barbieri et al. 2023 moderator, search summary).
 - Decision table cells, support ladder rungs, physical-skill loop: Practitioner synthesis.
+- Concrete case before the rule: Practitioner (video educators, note I pass 2), consistent with concreteness fading (note E). Forced-choice prediction with the popular wrong answer: Moderate (Muller et al. 2008; refutation-text meta-analyses, note K).
 
-<!-- Sources: research/notes/A-tell-guide-do.md (decision table, contingency, ladder, signals, worked examples, fading, expertise reversal, productive failure, guidance debate, learn-claim check); research/notes/C-expert-tutoring.md (ICAP, INSPIRE, novice vs expert tutor turns); research/notes/G-ai-tutoring.md (Bastani, Kestin, Khanmigo critique); research/notes/F-domain-pedagogy.md (subgoal labels, Barbieri math meta-analysis, physical-skill loop); research/notes/E-artifact-design.md finding 4 (concreteness fading); research/baseline/fretboard-teardown/01-instructional-design.md F03, F31 and root cause 6; 03-guitar-teacher.md error 6. -->
+<!-- Sources: research/notes/A-tell-guide-do.md (decision table, contingency, ladder, signals, worked examples, fading, expertise reversal, productive failure, guidance debate, learn-claim check); research/notes/C-expert-tutoring.md (ICAP, INSPIRE, novice vs expert tutor turns); research/notes/G-ai-tutoring.md (Bastani, Kestin, Khanmigo critique); research/notes/F-domain-pedagogy.md (subgoal labels, Barbieri math meta-analysis, physical-skill loop); research/notes/E-artifact-design.md finding 4 (concreteness fading); research/notes/I-video-educators.md pass 2 techniques 1 and 3 (forced-choice opener, concrete case first); research/notes/K-misconceptions-and-verification.md finding 4 (refutation); research/baseline/fretboard-teardown/01-instructional-design.md F03, F31 and root cause 6; 03-guitar-teacher.md error 6. -->

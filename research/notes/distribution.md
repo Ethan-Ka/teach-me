@@ -79,3 +79,27 @@ Source: https://code.claude.com/docs/en/plugin-marketplaces and https://code.cla
 3. Confirm the uploaded skill is usable on mobile.
 4. Confirm whether the skill can create artifacts and use web search in claude.ai (separate feature toggles).
 5. Packaging: strip any frontmatter keys outside the claude.ai allowlist from the app build.
+
+## Update 2026-11-11 (K session): description length limits, resolved as far as docs allow
+
+**Research question:** practical; settles the 1024 vs 200 conflict above.
+
+| Surface | Limit on `description` | Exact text and URL |
+|---|---|---|
+| claude.ai app, "How to create custom skills" (support) | 200 characters | "Claude uses this to determine when to invoke your skill (200 characters maximum)." Same article: name "(64 characters maximum)"; "This file must start with a YAML frontmatter to hold name and description fields, which are required metadata." Optional: "dependencies" ("Software packages required by your skill."). https://support.claude.com/en/articles/12512198-creating-custom-skills |
+| Agent Skills spec | 1024 characters | "Must be 1-1024 characters". Also `compatibility` max 500, `name` max 64, no consecutive hyphens, must match the directory name. https://agentskills.io/specification |
+| Platform docs overview (API) | 1,024 characters | "`description`: Must be non-empty; Maximum 1,024 characters; Cannot contain XML tags". https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview |
+| Claude Code | no separate cap on description alone; combined cap in the listing | "the combined `description` and `when_to_use` text is truncated at 1,536 characters in the skill listing". https://code.claude.com/docs/en/skills |
+
+- **Answer:** The only official text giving a claude.ai-specific number is the support article, which says 200. The spec and API docs say 1,024; Claude Code truncates at 1,536. These conflict and I could not run an upload test, so the claude.ai limit is unconfirmed by behaviour. The "Using Skills in Claude" article (https://support.claude.com/en/articles/12512180-using-skills-in-claude) gives no number; it lists the error "Invalid characters in skill name or description" and "Skill folder name doesn't match the skill name".
+- **Consequence for this repo:** the current teach-me `description` is about 981 characters (joined, measured 2026-11-11). It satisfies the spec and API (1,024) but would exceed 200 if the support article is enforced. Options: ship a short (200 or fewer) description in the claude.ai build and keep the long one for Claude Code and the API, or test an upload with a 300-character and a 900-character description (open item 1 above). Note the multi-line YAML block scalar counts newline joins; keep the claude.ai build to a single line.
+- **Frontmatter fields claude.ai accepts:** Claude Code docs, section titled "Using skill frontmatter outside Claude Code" (the earlier note called it "Notes on other surfaces"; that heading did not appear in the text I read): "claude.ai skill uploads, the Skills API, and packaging with `package_skill.py` from anthropics/skills" may use `name`, `description`, `license`, `compatibility`, `metadata`, `allowed-tools`. Any other field fails: "Unexpected key(s) in SKILL.md frontmatter: argument-hint. Allowed properties are: allowed-tools, compatibility, description, license, metadata, name". The claude.ai support article instead mentions an optional `dependencies` field, which is not in that allowlist; treat as a doc conflict and omit `dependencies`. The same page says claude.ai uploads are also how a personal skill reaches Cowork and cloud sessions, under the same rules. The page text was truncated at 100,000 of 118,895 characters, so a later section may add detail. https://code.claude.com/docs/en/skills
+- Claude Code ignores unrecognised fields silently ("Claude Code ignores a field it doesn't recognize without reporting an error"), unlike claude.ai uploads.
+- Platform overview: custom skills on claude.ai are on "Pro, Max, Ultra, Team, and Enterprise plans with code execution enabled" (Free is not listed). Consistent with the earlier "Free unconfirmed" note.
+
+## Sources to log
+- Creating custom skills (claude.ai help). Anthropic. https://support.claude.com/en/articles/12512198-creating-custom-skills. 2026-11-11.
+- Using Skills in Claude (claude.ai help). Anthropic. https://support.claude.com/en/articles/12512180-using-skills-in-claude. 2026-11-11.
+- Agent Skills specification. agentskills.io. https://agentskills.io/specification. 2026-11-11.
+- Agent Skills overview. Anthropic platform docs. https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview. 2026-11-11.
+- Extend Claude with skills. Claude Code docs. https://code.claude.com/docs/en/skills. 2026-11-11.

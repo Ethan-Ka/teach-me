@@ -47,11 +47,11 @@ Don't make the learner wait through research for a quick question. For a course,
 
 Five things, in order of value:
 
-1. **The common misconceptions.** What do learners of this topic reliably get wrong, and what probe exposes it? This is the highest-value find, because it's what you're least likely to know and it changes the teaching most.
-2. **The standard explanation path.** In what order do good teachers introduce the ideas? What do they treat as the prerequisite? What do they deliberately leave out at first?
+1. **The common misconceptions.** What do learners of this topic reliably get wrong, and what probe exposes it? For the most popular one, also find a case it can't explain: that case becomes your hook. This is the highest-value find, because it's what you're least likely to know and it changes the teaching most.
+2. **The standard explanation path.** In what order do good teachers introduce the ideas? What do they treat as the prerequisite? What do they deliberately leave out at first? If the field has a one-sentence core idea that the rest unfolds from (picture every vector as an arrow from the origin; treat a neural network as one big function), note it; not every topic has one.
 3. **The best examples and analogies.** Which concrete case makes it click? Which analogy do several strong sources use, and where does it break?
 4. **Where learners get stuck.** Forum questions, "I finally get it" comments, the points where an educator slows down or says "this is the part that trips people up."
-5. **What practice looks like.** The standard exercises, drills, or problem types, and how practitioners check them.
+5. **What practice looks like.** The standard exercises, drills, or problem types, and how practitioners check them, including any countable bar teachers use to say "ready to move on".
 
 You're not looking for a summary of the topic. You can usually produce that. You're looking for teaching knowledge: the specific path, pitfalls and examples that come from having taught it many times.
 
@@ -77,7 +77,7 @@ View count measures reach, not teaching. Muller's research shows the trap: viewe
 - **Other educators and courses point to it.** Syllabi, course pages, subject wikis and FAQs that link it; repeated recommendations across independent sources.
 - **It uses teaching moves.** The creator asks the viewer to pause and predict, works a concrete example before the general rule, shows a mistake happening, names the common misconception, and is honest about simplifications. Karpathy's "pause the video here and see if you can figure it out yourself" and his on-screen bug ("you forgot to zero grad") are the pattern.
 - **Comments show it landed for people at the learner's level,** and the questions in the comments point at specific moments of confusion (useful for you).
-- **It's accurate.** Spot-check two or three claims against another source. One wrong fact is a reason to look elsewhere.
+- **It's accurate.** Spot-check two or three claims against another source. One wrong fact is a reason to look elsewhere. This includes claims about learning itself: a popular study-skills video arguing that retrieval practice and spacing are overrated runs against some of the best-supported findings there are. Borrow a creator's teaching moves, not their learning-science claims.
 - **It's current,** for anything with versions (software, tools, rules of a sport).
 - **It matches the learner's level and goal.** A great video for experts is a bad video for this beginner.
 - **It has chapters or timestamps,** so you can point to the exact segment.
@@ -125,14 +125,16 @@ Then synthesize across sources:
 
 ## 8. Borrow the moves, not the medium
 
-Video educators can't check the viewer. You can. Take what they do, and add the part a video can't:
+Video educators can't check the viewer. You can. Across about a dozen widely watched educators coded for this skill, almost none of the videos contained practice with feedback; the practice loop lived outside the video, on a platform or in a course page. That gap is the part a chat tutor can fill. Take what they do, and add the part a video can't:
 
 | Video move | In chat | In an artifact |
 |---|---|---|
+| A puzzle with a few named answers; viewer told to commit; answer held back until the evidence is in | Offer two to four options, the popular wrong one among them, and wait for a pick before explaining | A forced-choice prediction that gates the reveal |
 | "Pause and try it" | Ask, then wait for the answer before continuing | A prediction item that gates the reveal |
-| Concrete case before rule | Same | Same; one specific instance first |
-| Shows the mistake on screen | Show a labeled wrong version after the right one, and ask what's wrong | A "find the bug" item with feedback |
-| Names the misconception | Ask which one they hold, then contrast | Wrong-option feedback that names it |
+| Concrete case before rule (a locker search, a house as a point, one number worked in two bases) | One specific instance first, then the rule; reuse the same case as the lesson grows | Same; one specific instance first, carried through the chunks |
+| Shows the mistake on screen | Show a labeled wrong version after the right one, and ask what's wrong. For a novice, right version first, so the error isn't remembered as the answer | A "find the bug" item with feedback |
+| Names the popular wrong model, then shows a case it can't explain | Ask which one they hold, then show the case and contrast | Wrong-option feedback that names it, next to the case that breaks it |
+| A countable bar to move on (changes per minute, a mastery percentage) | Ask for the number, and use it to set the next step | A counter or streak tied to the stated bar |
 | "Let's quickly recap" (restating) | Replace with "before I recap, what are the three steps?" | End-of-page retrieval, not a restated summary |
 | Production polish, animation | Doesn't carry over; skip | A static diagram or a stepper, not an animation of the whole mechanism |
 
@@ -242,8 +244,9 @@ The learner asks for an interactive lesson on the TCP three-way handshake for an
 - Wrong worked examples and the hedge-instead-of-check pattern: direct evidence from the fretboard teardown (all three reviews).
 - Solutions in hand before tutoring: Moderate (Kestin et al. 2025, PMC full text read).
 - Clear exposition doesn't remove misconceptions; clarity ratings aren't learning: Moderate (Muller et al. 2008 via secondary descriptions; Muller's video transcript).
-- Video teaching moves (pause-and-predict, concrete first, shown mistake): Practitioner (three sources coded in note I, one as text only).
+- Video teaching moves (pause-and-predict, concrete first, shown mistake, countable exit bar): Practitioner (note I: three sources in pass 1, six transcript-coded in pass 2, all read through a summarizer, so no wording is quoted). The forced-choice opener and naming the popular wrong model with a case it can't explain: Moderate, because they match Muller et al. 2008 and the refutation-text meta-analyses (note K). Concrete case before rule: Practitioner, consistent with concreteness fading (note E); experts may do better rule-first. Practice missing from videos: Practitioner (note I pass 2 frequency table).
+- Creator claims that retrieval and spacing are overrated: contradicted by Strong evidence (note D finding 1); not adopted.
 - Signals for video quality, research sources, extraction template, proportionality table: Practitioner.
 - Transcript tooling: practical; tool flags are current as of writing and access is unreliable (note I recorded 403s and blocked transcript sites).
 
-<!-- Sources: research/notes/I-video-educators.md (coded teaching moves, Muller check, transcript-access failures, video-recommendation guidance); research/notes/G-ai-tutoring.md finding 2 (Kestin expert solutions); research/notes/E-artifact-design.md finding 3 (misconceptions from research step) and finding 7 (recompute every example); research/notes/distribution.md (network access in claude.ai may be full, partial or none); research/baseline/fretboard-teardown/01-instructional-design.md F01-F17, structural failure 1, root cause 2; 02-learner-walkthrough.md (self-contradiction tag, L03 wall); 03-guitar-teacher.md factual-error table and lesson 1. -->
+<!-- Sources: research/notes/I-video-educators.md (coded teaching moves; pass 2 techniques 1, 2, 3, 6, 8, 10 and the contradicted-claims list; Muller check, transcript-access failures, video-recommendation guidance); research/notes/G-ai-tutoring.md finding 2 (Kestin expert solutions); research/notes/E-artifact-design.md finding 3 (misconceptions from research step) and finding 7 (recompute every example); research/notes/distribution.md (network access in claude.ai may be full, partial or none); research/baseline/fretboard-teardown/01-instructional-design.md F01-F17, structural failure 1, root cause 2; 02-learner-walkthrough.md (self-contradiction tag, L03 wall); 03-guitar-teacher.md factual-error table and lesson 1. -->
