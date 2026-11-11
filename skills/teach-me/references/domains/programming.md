@@ -30,7 +30,7 @@ Where the general process changes for code: reading before writing, tracing, Par
 
 ## 2. PRIMM: predict before you run
 
-Predict, Run, Investigate, Modify, Make. A school study (Sentance, Waite and Kallia 2019; 493 students aged 11 to 14) found PRIMM classes outperformed controls. The evidence is school-age novices; for experienced programmers, skip straight to Modify or Make.
+Predict, Run, Investigate, Modify, Make. A school study (Sentance, Waite and Kallia 2019; 493 students aged 11 to 14 in 13 schools, with a control group) evaluated it with mixed methods. I verified the design, not the outcome measures, so treat it as promising, not proven. The evidence is school-age novices; for experienced programmers, skip straight to Modify or Make.
 
 | Stage | What the learner does | Example wording |
 |---|---|---|

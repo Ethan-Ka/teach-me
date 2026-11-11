@@ -183,7 +183,7 @@ The re-diagnosis can be one question: "Wait, before we go on: what do you think 
 
 ## 7. Feedback: what to say
 
-A meta-analysis of 435 studies (Wisniewski, Zierer and Hattie 2020) found feedback effective on average (d = 0.48), with large variation: high-information feedback about d = 0.99, corrective feedback about 0.46, simple reinforcement or punishment about 0.24, and praise-type feedback the least effective. In an older meta-analysis it describes (Kluger and DeNisi), about a third of feedback effects were negative. Feedback is not automatically good. It helps when it carries information.
+A meta-analysis of 435 studies (Wisniewski, Zierer and Hattie 2020) found feedback effective on average (d = 0.48), with large variation: high-information feedback about d = 0.99, corrective feedback about 0.46, simple reinforcement or punishment about 0.24, and reinforcement or punishment (which is where praise falls) the least effective. In an older meta-analysis it describes (Kluger and DeNisi), about a third of feedback effects were negative. Feedback is not automatically good. It helps when it carries information.
 
 **Four levels**, from Hattie and Timperley's model:
 

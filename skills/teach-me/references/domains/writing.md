@@ -127,7 +127,7 @@ For anything that will be submitted for a grade: don't write text meant to be tu
 - Twenty comments with no priority.
 - Praise with no information ("great job").
 - A model with no evaluation task.
-- Treating workshop structure (free choice, peer sharing, time to write) as enough. Its effect is modest and absent for struggling writers (Sandmel and Graham 2011); they need an explicit strategy.
+- Treating workshop structure (free choice, peer sharing, time to write) as enough. Its effect is modest and absent for struggling writers (Graham and Sandmel 2011); they need an explicit strategy.
 - Quoting a writing effect size to a learner as if it will hold for one chat.
 
 ## 12. Mini-transcripts
@@ -158,7 +158,7 @@ All writing-specific findings were read at abstract level or through secondary s
 - Explicit strategy instruction: Strong for direction (Graham and Perin 2007; newer syntheses smaller). SRSD in miniature: Moderate to Strong, developer-heavy evidence, multi-week teacher delivery.
 - Feedback on drafts acted on by the writer: Moderate (Graham, Hebert and Harris 2015, grades 1 to 8; "computer" feedback there is old automated scoring, not an LLM).
 - Models with think-aloud and an evaluation task: Moderate (Rijlaarsdam and colleagues; abstract-level).
-- Conference shape (intent first, one point, next step): Practitioner. Workshop structure alone: Moderate evidence of a modest effect (Sandmel and Graham 2011).
+- Conference shape (intent first, one point, next step): Practitioner. Workshop structure alone: Moderate evidence of a modest effect (Graham and Sandmel 2011).
 - Don't rewrite their prose: Moderate by analogy from math (Bastani et al. 2025); no writing study found.
 - Rubric self-check with quotes: Practitioner (area B finding 5, area D finding 5).
 - Revision as practice, levels of diagnosis, fading in writing: v0.

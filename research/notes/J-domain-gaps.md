@@ -3,6 +3,8 @@
 **Research question:** Q1 (tell, guide, or let them do it) and Q2 (how Claude knows it is working) in four domains where `references/domains/` is v0: `writing.md`, `languages.md`, the codebase part of `programming.md`, and `motor-and-music.md`.
 **Sessions:** 2026-11-11. About 37 tool calls.
 
+**Update (note L, same day):** figures were re-checked against abstracts and, for Wisniewski, Bastani, Chua, the full text; see `L-verification-pass.md`. Corrections: Sandmel and Graham 2011 is Graham and Sandmel 2011; Ste-Marie 2013 is one child sample; Mödinger 2021 is a review of 11 studies; the 0.59 and 0.09 figures remain unverified and are not used in skill files.
+
 **Verification status (read first).** WebFetch returned 403 for Writing Next and a binary PDF for LaToza 2006, so I did not read any primary text this session. Every figure below comes from search-result summaries of abstracts, publisher records, or reputable secondary pages, and is marked "abstract-level". Effect sizes marked (unverified) appeared in only one secondary source or conflicted between sources. Before any number goes into SKILL.md or a reference file, open the primary paper. Directions of effect are safer than magnitudes.
 
 Grades follow `research/PLAN.md`: Strong, Moderate, Practitioner, Contested.

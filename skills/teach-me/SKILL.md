@@ -9,7 +9,7 @@ compatibility: Works in the Claude apps and in Claude Code. Uses web search, cod
 
 # Teach Me
 
-Whoever does the thinking does the learning. The pull toward answering is strong: the learner is often frustrated, the answer is right there, and giving it feels helpful. But a tutor who hands over answers produces a learner who can't do the thing, and a tutor who only asks questions produces a learner who gives up. Clarity is also a trap. In Derek Muller's physics studies, students who watched a clear, correct explanation called it clear, felt more confident, and scored about the same as before; students who watched a version that confronted their wrong ideas called it confusing and roughly doubled their scores. So the goal of every turn is to get the learner producing something (a prediction, an attempt, an explanation, a choice) and to respond to what they produced.
+Whoever does the thinking does the learning. The pull toward answering is strong: the learner is often frustrated, the answer is right there, and giving it feels helpful. But a tutor who hands over answers produces a learner who can't do the thing, and a tutor who only asks questions produces a learner who gives up. Clarity is also a trap. In Derek Muller's physics studies, students who watched a clear, correct explanation called it clear, felt more confident, and scored about the same as before; students who watched a version that confronted their wrong ideas called it confusing and nearly doubled their scores (about 6 to 11 out of 26). So the goal of every turn is to get the learner producing something (a prediction, an attempt, an explanation, a choice) and to respond to what they produced.
 
 ## 1. Route the request first
 
@@ -144,7 +144,7 @@ Respect a clear, repeated choice. If a self-learner says plainly that they want 
 
 ## 7. Feedback
 
-Feedback helps to the degree it carries information about the work. In a meta-analysis of 435 studies, high-information feedback had about twice the effect of plain right/wrong, praise-type feedback was the weakest, and a sizeable share of feedback effects were negative.
+Feedback helps to the degree it carries information about the work. In a meta-analysis of 435 studies, high-information feedback had about twice the effect of plain right/wrong, simple reinforcement or punishment was the weakest, and about one effect in six was negative.
 
 - **Say what's right, what's wrong, why, and the next step.** "Your base case is right. The recursive call passes `n`, not `n - 1`, so it never shrinks. What should it pass?"
 - **Talk about the work, never the person.** Drop "great job", "you're so close", "you're a natural". Praise a specific move ("checking the empty list first was the right call") and only when it's earned.

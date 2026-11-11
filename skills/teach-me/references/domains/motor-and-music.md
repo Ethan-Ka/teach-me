@@ -107,7 +107,7 @@ Listening back catches what playing hides; watching back catches what doing hide
 - **Compare to yourself.** Keep the day-1 recording. Record the same passage on day 7 and compare against the same checklist. Visible progress is a strong reason to keep going.
 - **Slow-motion video** for technique: the picking hand, a golf swing, a tennis toss. Give a short checklist of what to look for.
 
-Video of one's own performance helped motor learning and beat verbal feedback alone in physical-education studies, and learners who chose when to watch learned more (Moderate: Mödinger et al. 2021; Ste-Marie et al. 2013). A novice watching a take may not know what to look at, which is why the three-item checklist matters (Practitioner).
+Video of one's own performance helped motor learning and beat verbal feedback alone in physical-education studies, and learners who chose when to watch learned more (Moderate: Mödinger, Woll and Wagner 2021, a systematic review of 11 school studies; Ste-Marie, Vertes, Law and Rymal 2013, one study of children on a trampoline). A novice watching a take may not know what to look at, which is why the three-item checklist matters (Practitioner).
 
 ## 8. The "not yet" path
 
@@ -146,7 +146,7 @@ If the learner can share a recording, photo or video and your environment can ta
 - **Ask for their judgment before giving yours.** "What did you notice?" first, then your read, and don't comment on every attempt. The idea that less frequent feedback builds independence is Contested in the lab, but in chat reports arrive in batches anyway, and their own judgment is the skill being trained.
 - **Ask for counts, not feelings.** "Out of 10 tries at 60 bpm, how many were clean? Which beat drifts?" beats "how did it go?" Use the count to set the next step (4 of 5 clean: up one notch; under 3 of 5: slow down), and say plainly that it's self-reported. Novices tend to overrate themselves, so prefer checks with an outside reference: the metronome, a recording, a tuner (Practitioner).
 - **Give a countable exit criterion for each stage.** Popular guitar courses stage practice around one: time a minute of changes between two chords, count them, and move on past a stated number. A number a learner can reach and report beats "until it feels smooth" (Practitioner; the exact thresholds are creators' targets).
-- **Prefer cues about the result over cues about the body,** as a default to test. "Let the string ring clean" over "curl your finger more"; "aim the chisel edge at the line" over "keep your elbow in". A large meta-analysis favored this external focus (Chua et al. 2021), but a 2024 reanalysis attributes much of the effect to selective reporting (McKay et al. 2024), and the studies are lab tasks with simple targets. Contested. Use a body cue when the learner can't make the movement at all.
+- **Prefer cues about the result over cues about the body,** as a default to test. "Let the string ring clean" over "curl your finger more"; "aim the chisel edge at the line" over "keep your elbow in". A large meta-analysis favored this external focus (Chua et al. 2021), but a 2024 Bayesian reanalysis that corrects for publication bias puts the effects near zero (g from 0.01 to 0.15; McKay et al. 2024), and the studies are lab tasks with simple targets. Contested. Use a body cue when the learner can't make the movement at all.
 - **Blocked first, mixed later.** Repeat the one change until it's clean, then in a later session mix variants (A to D, D to E, E to A in random order). Warn them mixed practice feels harder and looks worse on the day. Contested: the benefit of mixing shows mostly in lab studies and older adults, and is small and non-significant in applied studies.
 - **Plan practice by strategy, not minutes.** In one study of pianists, what they did in practice (targeting errors, slowing down) predicted next-day performance better than how long they practiced (Moderate, small: Duke, Simmons and Cash 2009, one session).
 - **Run it as a submit-and-review loop.** "Record one minute. Check these three things. Come back and tell me. Here's your one assignment until then." This is how online music coaches work asynchronously (Practitioner, vendor sources only).
@@ -271,14 +271,14 @@ The same design works for any physical skill:
 
 - Honor-system self-check design (observable criteria, record and compare, calibration, not-yet path, report back): Practitioner, built on the feedback evidence (area B) and the fretboard teardown.
 - Feedback on physical skill without observation: no direct study found (notes F, J). Counts with an outside reference: Practitioner. Learner's judgment first: Practitioner; feedback-frequency research is Contested.
-- Self-video with a checklist: Moderate (Mödinger et al. 2021; Ste-Marie et al. 2013; abstract-level).
+- Self-video with a checklist: Moderate (Mödinger, Woll and Wagner 2021; Ste-Marie et al. 2013, one child sample; abstract-level).
 - External focus of attention: Contested (Chua et al. 2021 vs McKay et al. 2024).
 - Blocked then mixed practice: Contested (weak in applied studies, 2024 meta-analysis).
 - Practice strategy over time: Moderate, small (Duke et al. 2009).
 - Countable exit criterion per stage: Practitioner (JustinGuitar, snippets only; note I pass 2).
 - Submit-and-review loop: Practitioner (vendor sources).
 - Slow practice and chunking: Practitioner to Moderate, survey and interview studies; low confidence (note F).
-- Deliberate practice: Contested (Macnamara et al. 2014: about 21% of variance in music; corrected figures higher).
+- Deliberate practice: Contested (Macnamara et al. 2014: 21% of variance in music, verified; a separate music-only meta-analysis, Platz et al. 2014, reports r = 0.61 after correcting for unreliability).
 - Start from what they play, songs early, move-on vs mastery bars, physical safety, perception before symbol: the guitar teacher's teardown (03), lessons 2, 3, 5, 10, and the learner walkthrough (02).
 - Session plan: v0 (JustinGuitar structure seen only in snippets, note I).
 - Ear training: v0, not researched.
