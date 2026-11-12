@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toll Trainer</title>
+<style>
+:root{--bg:#fbf8f2;--ink:#2a2622;--accent:#2f6f5e;--card:#fff;--soft:#e9f2ee}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Georgia,serif}
+main{max-width:680px;margin:0 auto;padding:32px 16px}
+h1{font-size:2rem;margin:0 0 4px}.sub{color:#6b625a;margin:0 0 28px}
+section{background:var(--card);border-radius:14px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px #0001}
+.practice{background:var(--soft)} .hint{display:none;font-style:italic;margin-top:8px}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:6px 14px;font:inherit;cursor:pointer}
+.fb{font-weight:bold;margin-top:6px}
+</style></head><body><main>
+<h1>Welcome to the Toll Trainer!</h1>
+<p class="sub">You're going to be great at this. Let's learn Brindle Bridge tolls together, one friendly step at a time.</p>
+
+<section><h2>Step 1: Crates</h2>
+<p>Every toll starts with the crates. Each crate costs <b>2 coins</b>, and every crate beyond the 6th costs <b>3 coins</b>. Example: 8 crates = 6 × 2 + 2 × 3 = 18 coins.</p></section>
+
+<section class="practice"><h3>Quick practice</h3>
+<p>How much does each of the first six crates cost?</p>
+<label><input type="radio" name="p1" value="1"> 1 coin</label><br>
+<label><input type="radio" name="p1" value="2"> 2 coins</label><br>
+<label><input type="radio" name="p1" value="3"> 3 coins</label><br>
+<button onclick="check('p1','2','fb1')">Check</button><div class="fb" id="fb1"></div></section>
+
+<section><h2>Step 2: Dusk and the lantern</h2>
+<p>At Dusk, the toll so far is <b>doubled</b>, unless the traveler's lantern counts as lit. A lit lantern only counts if the traveler has <b>4 crates or fewer</b>; with more, their hands are full and the lantern is lowered. At Dawn and Day the lantern does nothing.</p></section>
+
+<section class="practice"><h3>Quick practice</h3>
+<p>True or false: a lit lantern always stops the Dusk doubling.</p>
+<label><input type="radio" name="p2" value="T"> True</label><br>
+<label><input type="radio" name="p2" value="F"> False</label><br>
+<button onclick="check('p2','F','fb2')">Check</button><div class="fb" id="fb2"></div></section>
+
+<section><h2>Step 3: Guilds</h2>
+<p>Millers have the toll so far <b>halved</b> (round down). Weavers take <b>4 coins off</b> (never below 0).</p>
+<h2>Step 4: Salt</h2>
+<p>Salt adds a <b>5-coin fee</b> after the guild rule, so guild discounts never touch it. No salt fee at Dawn.</p></section>
+
+<section class="practice"><h3>Your turn!</h3>
+<p>A Miller arrives at Day with 6 crates, an unlit lantern, and salt. What's the toll after Step 4?</p>
+<input id="p3" size="4"> <button onclick="checkNum('p3',11,'fb3')">Check</button>
+<button onclick="document.getElementById('h3').style.display='block'">Need a hint?</button>
+<div class="hint" id="h3">Hint: 6 crates is 12. Day means no doubling. The Miller halves 12 to 6, and then you add the 5-coin salt fee: 6 + 5.</div>
+<div class="fb" id="fb3"></div></section>
+
+<section class="practice"><h3>Your turn!</h3>
+<p>A traveler with 5 crates and no guild arrives at Dusk with a lit lantern. What's the toll after Step 2?</p>
+<input id="p4" size="4"> <button onclick="checkNum('p4',20,'fb4')">Check</button>
+<button onclick="document.getElementById('h4').style.display='block'">Need a hint?</button>
+<div class="hint" id="h4">Hint: 5 crates is 10 coins. Since 5 is more than 4, the lantern doesn't count, so the 10 doubles to 20.</div>
+<div class="fb" id="fb4"></div></section>
+
+<section><h2>Steps 5 and 6: Free pass and cap</h2>
+<p>If the toll so far is <b>4 or less</b>, it becomes 0. And the final toll is <b>never more than 20</b>.</p></section>
+
+<section class="practice"><h3>Check yourself</h3>
+<p>1. Which comes first: the guild rule or the salt fee?</p>
+<label><input type="radio" name="q1" value="g"> Guild</label> <label><input type="radio" name="q1" value="s"> Salt</label>
+<button onclick="check('q1','g','fq1')">Check</button><div class="fb" id="fq1"></div>
+<p>2. What is the highest toll anyone can pay?</p>
+<label><input type="radio" name="q2" value="15"> 15</label> <label><input type="radio" name="q2" value="20"> 20</label> <label><input type="radio" name="q2" value="25"> 25</label>
+<button onclick="check('q2','20','fq2')">Check</button><div class="fb" id="fq2"></div>
+<p>3. A toll of 4 or less becomes...</p>
+<label><input type="radio" name="q3" value="0"> 0</label> <label><input type="radio" name="q3" value="4"> 4</label>
+<button onclick="check('q3','0','fq3')">Check</button><div class="fb" id="fq3"></div></section>
+
+<section><h2>You did it!</h2>
+<p>Amazing work! Here's everything in one place: crates (2, then 3 past the 6th), Dusk doubling (lantern counts only with 4 crates or fewer), guild (Miller halves, Weaver −4), salt (+5, not at Dawn), free pass (4 or less → 0), cap (20). You're ready for the bridge!</p></section>
+</main>
+<script>
+function check(n,v,f){const s=document.querySelector('input[name='+n+']:checked');document.getElementById(f).textContent=s&&s.value===v?'Correct! Nice work!':'Not quite, try again!'}
+function checkNum(i,v,f){document.getElementById(f).textContent=+document.getElementById(i).value===v?'Correct! You\'re a natural!':'Not quite, try again!'}
+</script></body></html>

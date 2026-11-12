@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Brindle Bridge Tolls</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4efe6;--ink:#1f2a2e;--muted:#5d6a6e;--accent:#b5582c;--card:#fffdf8;--line:#e2d8c6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161b1d;--ink:#ece6da;--muted:#9aa5a8;--card:#1f2629;--line:#2f383b}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Inter,system-ui,sans-serif}
+.hero{padding:72px 16px 48px;text-align:center;background:radial-gradient(circle at 50% 0,#d9a06b33,transparent 60%)}
+.hero h1{font:700 3rem/1.1 Fraunces,serif;margin:0}.hero p{color:var(--muted);max-width:520px;margin:12px auto 0}
+main{max-width:760px;margin:0 auto;padding:0 16px 64px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:32px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card .n{font:700 2rem Fraunces,serif;color:var(--accent)}.card h3{margin:4px 0 6px;font-family:Fraunces,serif}
+.flow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:24px 0}
+.flow span{background:var(--accent);color:#fff;border-radius:999px;padding:6px 14px;font-weight:600}
+.lore{border-left:4px solid var(--accent);padding:8px 16px;color:var(--muted);font-style:italic;margin:24px 0}
+table{width:100%;border-collapse:collapse;margin:16px 0}td,th{border-bottom:1px solid var(--line);padding:8px;text-align:left}
+.quiz{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:32px}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:6px 14px;font:600 14px Inter;cursor:pointer}
+.fb{font-weight:600;margin:4px 0 12px}
+</style></head><body>
+<header class="hero"><h1>The Brindle Bridge Tolls</h1>
+<p>Six rules, one keeper, centuries of tradition. Everything you need to know before your first shift at the bridge.</p></header>
+<main>
+<div class="lore">"The bridge remembers every coin." For over three hundred years the keepers of Brindle have reckoned tolls by the same six rules, handed down from keeper to apprentice by lantern-light.</div>
+
+<h2 style="font-family:Fraunces,serif">The order of the reckoning</h2>
+<div class="flow"><span>1 Crates</span><span>2 Dusk</span><span>3 Guild</span><span>4 Salt</span><span>5 Free pass</span><span>6 Cap</span></div>
+<p>The keeper always applies the rules in this order, each working on the toll so far.</p>
+
+<div class="grid">
+<div class="card"><div class="n">1</div><h3>Crates</h3><p>2 coins per crate. Every crate beyond the 6th costs 3 coins.</p></div>
+<div class="card"><div class="n">2</div><h3>Dusk</h3><p>At Dusk the toll so far is doubled, unless the lantern counts as lit. A lit lantern counts only with 4 crates or fewer, because with more the traveler's hands are full. The lantern does nothing at Dawn or Day.</p></div>
+<div class="card"><div class="n">3</div><h3>Guild</h3><p>Millers: the toll so far is halved, rounding down. Weavers: 4 coins off, never below 0. No guild, no change.</p></div>
+<div class="card"><div class="n">4</div><h3>Salt</h3><p>A 5-coin fee for carrying salt. It's a fee, not part of the load, so the guild rule never touches it. Waived at Dawn.</p></div>
+<div class="card"><div class="n">5</div><h3>Free pass</h3><p>If the toll so far is 4 coins or less, it becomes 0.</p></div>
+<div class="card"><div class="n">6</div><h3>Cap</h3><p>The final toll is never more than 20 coins.</p></div>
+</div>
+
+<div class="lore">Did you know? The Miller's discount dates from the Great Flour Shortage, when the town council wished to keep bread cheap. The Weavers, not to be outdone, petitioned for their own.</div>
+
+<h2 style="font-family:Fraunces,serif">A worked example</h2>
+<p>6 crates, Miller, Dusk, lit lantern, carrying salt:</p>
+<table><tr><th>Rule</th><th>What happens</th><th>Toll</th></tr>
+<tr><td>Crates</td><td>6 × 2</td><td>12</td></tr>
+<tr><td>Dusk</td><td>6 crates is more than 4, so the lantern doesn't count. Doubled.</td><td>24</td></tr>
+<tr><td>Guild</td><td>Miller halves</td><td>12</td></tr>
+<tr><td>Salt</td><td>Not Dawn, so +5</td><td>17</td></tr>
+<tr><td>Free pass</td><td>17 is more than 4</td><td>17</td></tr>
+<tr><td>Cap</td><td>Under 20</td><td><b>17</b></td></tr></table>
+
+<h2 style="font-family:Fraunces,serif">At a glance</h2>
+<table><tr><th>Rule</th><th>Effect</th><th>Exception</th></tr>
+<tr><td>Crates</td><td>2 each; 3 past the 6th</td><td>—</td></tr>
+<tr><td>Dusk</td><td>×2</td><td>Lit lantern with ≤ 4 crates</td></tr>
+<tr><td>Guild</td><td>Miller ½ (down), Weaver −4</td><td>Never below 0</td></tr>
+<tr><td>Salt</td><td>+5</td><td>Waived at Dawn; not discounted</td></tr>
+<tr><td>Free pass</td><td>≤ 4 → 0</td><td>—</td></tr>
+<tr><td>Cap</td><td>Max 20</td><td>—</td></tr></table>
+
+<div class="quiz"><h2 style="font-family:Fraunces,serif;margin-top:0">Quick quiz</h2>
+<p>1. How much does each of the first six crates cost?</p>
+<button onclick="a('f1',false)">1 coin</button> <button onclick="a('f1',true)">2 coins</button> <button onclick="a('f1',false)">3 coins</button><div class="fb" id="f1"></div>
+<p>2. At which hour can the toll be doubled?</p>
+<button onclick="a('f2',false)">Dawn</button> <button onclick="a('f2',false)">Day</button> <button onclick="a('f2',true)">Dusk</button><div class="fb" id="f2"></div>
+<p>3. How much is the salt fee?</p>
+<button onclick="a('f3',false)">3 coins</button> <button onclick="a('f3',true)">5 coins</button> <button onclick="a('f3',false)">10 coins</button><div class="fb" id="f3"></div>
+</div>
+<div class="lore">Safe travels, keeper. May your lantern stay lit and your ledger balance.</div>
+</main>
+<script>function a(id,ok){document.getElementById(id).textContent=ok?'✓ Correct':'✗ Incorrect'}</script>
+</body></html>

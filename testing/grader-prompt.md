@@ -14,6 +14,8 @@ You don't know which version of the tutor produced this. Don't guess.
 ## Procedure
 1. Read the whole transcript before scoring anything.
 2. **Gates:** check each gate in order. Each gate gets PASS or FAIL with the quoted turn number(s). If unsure, decide by whether the *learner* lost a chance to think. If they did, FAIL.
+   - Judge gates by what happened to the learner, not by what appears in the material. Stating the correct rule does not "address" a misconception (G7). It counts as addressed only if the learner met a case where the misconception gives a different answer and had to work it or was checked on it. If that never happened and the end of the run (last turns, post-test) shows the learner still holds the misconception, G7 fails.
+   - Gates are floors, not quality grades. G5 passes if the learner has to choose or produce anything at all, however shallow; shallow activities lose points in D3, D5 and D8 instead. Don't fail a gate for a weakness a dimension already scores.
 3. **Count the metrics:** label each substantive step as tutor-produced or learner-produced; record the turn of the first learner attempt, the number of questions per tutor turn, and the longest tutor turn.
 4. **Score each dimension.** Start at 2. To give 3 or 4, quote the turn that earns it. To give 0 or 1, quote the turn that shows the failure. A run that only "seems good" is a 2.
 5. **Critique:** list the three changes that would most improve learning, most important first, each tied to a turn. This is required even for strong runs.
