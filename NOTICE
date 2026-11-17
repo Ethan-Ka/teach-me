@@ -9,5 +9,8 @@ release, instructional artifact design, and related teaching guidance.
 
 The unmodified original is kept in upstream/learn/ (SKILL.md and LICENSE.txt).
 
+The multi-session workspace guidance (skills/teach-me/references/workspace.md)
+is adapted from a `teach` skill; an unmodified copy is in upstream/teach/.
+
 Licensed under the Apache License, Version 2.0. A copy of the license is in
 skills/teach-me/LICENSE.txt and upstream/learn/LICENSE.txt.

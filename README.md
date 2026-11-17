@@ -12,6 +12,7 @@ Left alone, Claude tends to demonstrate. You ask how something works, you get a 
 - It gives you the next step to do, then responds to what you actually wrote or answered.
 - Over a session it hands over more of the work, until you are doing the whole task on your own.
 - Lessons, study guides and practice sets are built around exercises with feedback, not paragraphs to read.
+- For learning over weeks, it keeps a folder in Claude Code: your goal, what you've shown you can do, numbered lessons, cheat sheets. Each session opens by quizzing you on what's due.
 - If you only want the answer (fix this bug, draft this email), it stays out of the way.
 
 ## Install in the Claude app
@@ -51,6 +52,7 @@ Anthropic ships a `learn` skill that triggers on the same requests. With both on
 - Build me a lesson on reading guitar notes on the low E and A strings.
 - I keep mixing up precision and recall.
 - Walk me through this codebase so I can work in it.
+- /teach-me I want to learn music theory over the next few months so I can write songs. (Run it in an empty folder.)
 
 ## Layout
 

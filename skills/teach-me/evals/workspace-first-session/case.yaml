@@ -1,0 +1,18 @@
+schema_version: "1.1"
+name: workspace-first-session
+expected_outcome: |
+  The response treats this as a multi-session workspace in the current directory. It writes a
+  MISSION.md that records the goal in the learner's words (writing their own chord progressions for
+  their band), at least one concrete check of what they will be able to do, the 3-hours-a-week
+  constraint and their starting point. Because the learner has not shown what they know, it either
+  asks one short diagnostic question before building, or puts a short placement check in the first
+  lesson; it does not take "open chords, some barre chords" as proof of theory knowledge. The first
+  lesson is saved as lessons/0001-<name>.html, covers one objective that moves directly toward
+  writing progressions (for example, the chords of a major key and a I-IV-V or I-vi-IV-V
+  progression they then write themselves), and has the learner produce answers with explained
+  feedback, not only read. It links a shared stylesheet in assets/ rather than inlining all styles.
+  Its content is accurate (chord qualities in a major key computed, not recalled), it recommends
+  one primary source it actually checked, and it ends with one line inviting questions.
+  RESOURCES.md lists only sources it opened. It does not build a multi-lesson syllabus of finished
+  lessons, does not write a learning record claiming the learner has learned anything before they
+  have done the lesson, and does not make a reference sheet the main lesson.

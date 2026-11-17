@@ -16,4 +16,4 @@ This repo builds the `teach-me` skill. See README.md for the layout.
 - Results and workspaces are gitignored (`testing/results/`, `skills/teach-me/evals/results/`, `skills/teach-me-workspace/`). Don't commit them.
 
 ## Upstream
-- Don't edit anything in `upstream/`. It is a verbatim copy of Anthropic's `learn` skill, kept for attribution and as a test baseline.
+- Don't edit anything in `upstream/`. It holds verbatim copies of Anthropic's `learn` skill and of a `teach` workspace skill (see `upstream/teach/PROVENANCE.md`), kept for attribution and as test baselines.

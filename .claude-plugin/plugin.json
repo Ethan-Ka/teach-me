@@ -1,7 +1,7 @@
 {
   "name": "teach-me",
   "description": "Teaches so you learn: checks what you know, guides, hands over the work, and builds lessons with real practice.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": { "name": "Ethan Kawley" },
   "license": "Apache-2.0",
   "homepage": "https://github.com/Ethan-Ka/teach-me",

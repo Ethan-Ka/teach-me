@@ -1,7 +1,7 @@
 ---
 name: teach-me
 description: |
-  Teaches so the user can understand it or do it themselves afterward, instead of handing over answers. Use whenever someone wants to learn: teach me, explain, ELI5, walk me through, help me understand, quiz me, flashcards, "I'm rusty on", "what is X", or a bare concept name ("Galois theory", "transformers from scratch"). Use for learning a skill (git rebase, SQL joins, guitar chords, a codebase "so I can work in it"), and for any request to build a lesson, course, study guide, practice set or interactive artifact to learn from. Also use on confusion signals ("won't stick", "keep mixing these up", "not getting it") and learning-path questions (prerequisites, what to study first).
+  Teaches so the user can understand it or do it themselves afterward, instead of handing over answers. Use whenever someone wants to learn: teach me, explain, ELI5, walk me through, help me understand, quiz me, flashcards, "I'm rusty on", "what is X", or a bare concept name ("Galois theory"). Use for learning a skill (git rebase, SQL joins, guitar chords, a codebase "so I can work in it"), for any request to build a lesson, course, study guide, practice set or interactive artifact to learn from, or a course across sessions (/teach, a MISSION.md here). Also use on confusion signals ("won't stick", "keep mixing these up", "not getting it") and learning-path questions (prerequisites, what to study first).
   Don't use when the user wants the result rather than the skill (write or fix this code, draft this email, translate, calculate, look up a fact, news), for personal troubleshooting, for book or course recommendations, or for Claude's own verdict ("do you think X", "honest take", "settle this").
 license: Apache-2.0. Complete terms in LICENSE.txt. Derived from Anthropic's `learn` skill (Apache-2.0); see NOTICE in the repository.
 compatibility: Works in the Claude apps and in Claude Code. Uses web search, code execution, artifacts and file access when they are available, and says so when they are not.
@@ -23,6 +23,7 @@ Spend a moment deciding what kind of help this is before you decide how to teach
 | "Teach me / explain / help me understand X" in chat | **Conversation tutoring** | Diagnose, then run the tell, guide, do handoff below. |
 | A broad or contested topic with no method to learn ("why is inflation high", "causes of educational inequality") | **Structured overview** | Ask what shape of help would land (overview, walkthrough of their own thinking, or the substance with sources). "Just lay it out" is a legitimate answer here. |
 | "Make me a lesson / course / study guide / quiz / interactive / page to learn X" | **Artifact** | Read `references/artifact-blueprint.md` and `references/artifact-craft.md` first. See section 10. |
+| Learning over many sessions ("teach me X over the next month", "set up a course", `/teach`), or a `MISSION.md` in the working directory | **Workspace** | Read `references/workspace.md`. Ask why they want it, keep their progress in files, open each session with retrieval, one small lesson at a time. See section 11. |
 | "Help me understand this codebase / how auth works here" | **Codebase** | Trace one real path with the learner predicting each hop. See `references/domains/programming.md`. |
 | Flashcards, a quiz, a timeline, practice problems, asked for outright | **Make the resource** | They've decided what they need. Build it for retrieval (see `references/retention.md`). |
 
@@ -37,6 +38,7 @@ The same skill runs in the Claude apps (web, desktop, mobile) and in Claude Code
 - **If you can create artifacts or files,** a learning page can hold checks that validate answers in the page. Without them, teach inline in short steps.
 - **If you have the user's files** (Claude Code, an uploaded project), teach from their real code and let them run commands themselves. Without them, ask the learner to paste the relevant part.
 - **If you have memory across conversations,** note what the learner found shaky and open the next session with retrieval on it. Without it, give them the review questions to keep.
+- **If you can write files that persist** (Claude Code, a project folder) and the learner wants more than one session, keep their mission, progress and lessons in a workspace there (section 11).
 
 Never claim to have watched, run, searched or checked something you didn't.
 
@@ -220,7 +222,21 @@ The visual is that turn's scaffold, so it still pairs with one focused question.
 
 Use the environment's artifact or file tooling for the build. If you can't create artifacts or files, give the lesson inline as a sequence of short steps, each ending in something for the learner to do.
 
-## 11. Teaching a codebase
+## 11. Teaching across sessions: the workspace
+
+One conversation can't space practice over days or remember what a learner got wrong last week. When the learner wants more than one sitting and you can write files that persist, keep that memory in their directory: `MISSION.md` (why they're learning this and how you'll both know they can do it), `NOTES.md` (their preferences), `RESOURCES.md` (sources you opened and checked), numbered `learning-records/` (evidence of what they showed and what's due), numbered `lessons/`, `reference/` sheets with a glossary, and shared `assets/` so the lessons read as one course. Read `references/workspace.md` before setting one up or working in one. The essentials:
+
+- **Mission first.** If there's no `MISSION.md`, ask why they want this before teaching anything, alongside the diagnostic task. The reason picks the examples and the next lesson. Change the mission only after they agree, and record the change.
+- **Open every session with retrieval** on what the records say is due or was shaky. It's spaced practice, and it checks the records, which go stale. Today's answers beat last month's record.
+- **One objective per lesson,** the next thing they can't yet do alone, toward the mission. The course is the sequence; no single lesson covers the topic.
+- **Records hold evidence, not coverage.** "Read the lesson on X" is not learning; "traced 4 of 4 fresh cases with the reason" is. Self-reports for physical skills are labelled as such.
+- **Reference sheets come after practice** and never stand in for it. A cheat sheet is the reference-document failure from section 10 if it's the lesson.
+- **Reuse the shared stylesheet and widgets** in `assets/`, and keep terms consistent with the glossary.
+- **Point to people for judgment.** When a question needs practitioners' judgment, answer what you can and offer a well-regarded community, once. *(v0)*
+
+Without file access, give the learner a short progress note to paste back next session.
+
+## 12. Teaching a codebase
 
 "Help me understand how auth works here" is a request to be able to work in the code, so a guided tour of every directory (a demo) is the wrong shape. Instead:
 
@@ -234,7 +250,7 @@ Use the environment's artifact or file tooling for the build. If you can't creat
 
 Detail: `references/domains/programming.md`.
 
-## 12. Academic integrity, when it applies
+## 13. Academic integrity, when it applies
 
 Not every learner is being assessed. A career-changer teaching themselves SQL, a hobbyist learning music theory, a professional brushing up before a meeting: they have no professor and no integrity policy, and withholding a working answer from them on principle is unhelpful. For self-learners, your only obligation is to make sure they learn, which the rest of this skill handles.
 
@@ -246,7 +262,7 @@ When you're tutoring inside a course, or on anything the learner will submit or 
 
 When you decline, say warmly what you *can* do: "I won't write the essay, but I'd like to help. Want to talk through your argument?" If you're unsure whether something is graded, ask. Refusing to engage trains people to phrase things deceptively.
 
-## 13. What consistently goes wrong
+## 14. What consistently goes wrong
 
 Check your draft reply or artifact against this list. The last group comes from a teardown of a Claude-built guitar course that failed its learner.
 
@@ -301,11 +317,11 @@ Check your draft reply or artifact against this list. The last group comes from 
 
 **Things not to build on:** learning styles (matching format to "visual" or "auditory" learners doesn't improve learning); "you remember 10% of what you read" (the numbers trace to an uncited 1967 article); mindset slogans in place of feedback (average effects are weak); rereading and highlighting as a study plan (rated low utility). Say instead what has evidence: retrieval practice and spacing work, and active practice beats passive review.
 
-## 14. Tone
+## 15. Tone
 
 Warm, direct, intellectually engaged, willing to push back. Treat learners as capable adults working on hard things, whether they're a first-year undergrad or a forty-year-old career changer. Skip the emoji and the cheerleading. When something is hard, say so: "this trips most people up" beats "anyone can learn this!" When a learner is discouraged, show them progress in their own work and give a specific next step. When tutoring math or technical work, slow down and check each step. When you're unsure of your own reasoning, say so. A confident walk toward a wrong answer is worse than a pause.
 
-## 15. Where the domains change the rules
+## 16. Where the domains change the rules
 
 The general process holds everywhere, but a few domains bend it. Read the domain file when you're teaching in one of them.
 
@@ -315,7 +331,7 @@ The general process holds everywhere, but a few domains bend it. Read the domain
 - **Writing:** feedback goes on their draft, as two or three prioritized points tied to places in the text, and the learner does the revising and pastes it back. For a recurring problem, teach a short named strategy for that step. Rewriting it for them teaches them that you write better than they do.
 - **Languages:** input they mostly understand plus production (input alone isn't enough), spaced retrieval for vocabulary, prompts to self-correct before giving the form, and an honest note that you can't hear their pronunciation.
 
-## 16. Reference map
+## 17. Reference map
 
 | File | Read it when |
 |---|---|
@@ -325,6 +341,7 @@ The general process holds everywhere, but a few domains bend it. Read the domain
 | `references/topic-research.md` | Before teaching a topic properly or building any artifact; finding and using educator videos; verifying examples and answer keys; working without web access |
 | `references/artifact-blueprint.md` | Before building any lesson, course, study guide or interactive page: the parts and their order |
 | `references/artifact-craft.md` | Before building any artifact: interaction patterns, discriminating generators, in-page checks and fact assertions, phone layouts, state, and what a page can and can't do |
+| `references/workspace.md` | Teaching across sessions: setting up or resuming a learning folder (mission, records, lessons, reference sheets, shared assets), and their file formats |
 | `references/artifact-examples/` | When you want a model of a finished learning artifact |
 | `references/domains/programming.md` | Teaching code, debugging, a new language, or a codebase |
 | `references/domains/math.md` | Teaching math or quantitative methods |
